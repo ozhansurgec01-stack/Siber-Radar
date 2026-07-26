@@ -1,0 +1,9 @@
+.cache/
+.termux/
+.ssh/
+.cargo/
+.npm/
+__pycache__/
+*.log
+*.tar.gz
+.git-credentials
