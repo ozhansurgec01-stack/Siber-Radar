@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 ziyaretciler = []
 
+# 4 Yabancı Kamera
 kameralar = [
     ["Times Square Canlı Yayın (New York)", 40.7580, -73.9855, "https://www.youtube.com/embed/1-iS8LArMPA?autoplay=1&mute=1", "yt"],
     ["Shibuya Crossing (Tokyo)", 35.6595, 139.7004, "https://www.youtube.com/embed/36YnV9STBqc?autoplay=1&mute=1", "yt"],
@@ -14,6 +15,7 @@ kameralar = [
     ["Miami Beach (Florida)", 25.7617, -80.1918, "https://www.youtube.com/embed/Co4y1s0J3t0?autoplay=1&mute=1", "yt"]
 ]
 
+# Google Hava Durumu verileriyle güncellenmiş şehir listesi
 SEHIRLER = [
     {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist", "anlik": 29, "hissedilen": 29, "nem": 37},
     {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank", "anlik": 25, "hissedilen": 25, "nem": 35},
@@ -89,6 +91,7 @@ def get_weather():
     except Exception:
         pass
 
+    # İstek basarisiz olursa Google'dan alinan gercek yedek veriler devreye girer
     for s in SEHIRLER:
         alarm = "sicak" if s['anlik'] >= 38 or s['hissedilen'] >= 38 else None
         sonuclar.append({
@@ -132,6 +135,7 @@ def get_forecast5():
     except Exception:
         pass
 
+    # Tahmin API'si yanit vermezse Google Adana tahmin verileri devreye girer
     today = datetime.now()
     adana_tahmin = [
         {"max": 37, "min": 23, "durum": "Açık / Güneşli", "ikon": "☀️"},
@@ -166,7 +170,7 @@ def record_visit():
         now_str = datetime.now().strftime('%H:%M:%S')
         
         ziyaretciler.insert(0, {'sehir': city, 'ulke': country, 'bayrak': flag, 'zaman': now_str})
-        if len(ziyaretciler) > 50:
+        if len(ziyaretciler) > 20:
             ziyaretciler.pop()
         return jsonify({"status": "ok"})
     except Exception:
