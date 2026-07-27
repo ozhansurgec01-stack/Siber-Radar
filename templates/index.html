@@ -118,6 +118,7 @@
         <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;">📡 SİBER RADAR</div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:13px; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
         <div class="nav-buttons">
             <button class="toggle-btn" id="camListBtn" onclick="togglePanel('cam')">🎥 KAMERALAR</button>
+            <button class="toggle-btn" id="pollenBtn" onclick="polenAlarmGoster()">🌱 POLEN</button>
             <button class="toggle-btn" id="riskBtn" onclick="riskGoster()">📊 RİSK</button>
             <button class="toggle-btn" id="yildirimBtn" onclick="toggleRadarLayer('yildirim')">⚡ YILDIRIM</button>
             <button class="toggle-btn" id="mgmBtn" onclick="togglePanel('mgm')">📅 5 GÜN</button>
@@ -135,6 +136,16 @@
             </div>
             <div id="mgmAlertArea"></div>
             <div class="mgm-list" id="mgmForecastContent"><div style="text-align:center; padding:10px;">Veriler yükleniyor...</div></div>
+        </div>
+        <div id="pollen-banner" style="position: absolute; top: 10px; left: 10px; right: 10px; z-index: 999; background: rgba(11, 15, 25, 0.95); border: 2px solid #4ade80; border-radius: 6px; padding: 8px 12px; display: none; font-family: monospace; color: #fff;">
+            <div style="font-weight: bold; font-size: 11px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; margin-bottom: 6px; color: #4ade80;">
+                <span>🌱 POLEN VE ALERJİ DURUMU (ADANA)</span>
+                <span style="cursor:pointer; color:#ff4500;" onclick="polenAlarmGoster()">[X]</span>
+            </div>
+            <div style="font-size: 10px; line-height: 1.4; background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center;">
+                <span>🌲 Polen Yoğunluğu: <b>Düşük Seviye</b></span>
+                <span style="color:#4ade80; font-weight:bold;">🟢 Güvenli</span>
+            </div>
         </div>
         <div id="cam-list-banner">
             <div class="cam-list-title" style="color: var(--neon-color);">
@@ -368,6 +379,18 @@
         }
         depremleriYenile();
         setInterval(depremleriYenile, 60000);
+
+        function polenAlarmGoster() {
+            let b = document.getElementById("pollen-banner");
+            let btn = document.getElementById("pollenBtn");
+            if (b.style.display === "none" || b.style.display === "") {
+                b.style.display = "block";
+                btn.classList.add("active-mgm");
+            } else {
+                b.style.display = "none";
+                btn.classList.remove("active-mgm");
+            }
+        }
 
         function riskGoster() {
             let r = document.getElementById("miniRisk");
