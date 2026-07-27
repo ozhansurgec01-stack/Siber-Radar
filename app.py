@@ -23,19 +23,40 @@ def index():
 def get_kameralar():
     return jsonify(kameralar)
 
-# Frontend'in hata almaması için eklenen ana API rotaları
-@app.route('/api/weather')
-def get_weather():
+@app.route('/api/weather/<city>')
+def get_city_weather(city):
     try:
-        # Örnek veya aktif hava durumu köprüsü
-        return jsonify({"temp": "24°C", "status": "OK"})
+        # Örnek uyumlu hava durumu verisi
+        return jsonify({
+            "city": city,
+            "temp": "28°C",
+            "description": "Açık ve Güneşli",
+            "humidity": "%45"
+        })
     except Exception as e:
         return jsonify({"error": str(e)})
 
-@app.route('/api/earthquake')
-def get_earthquake():
+@app.route('/api/forecast/<city>')
+def get_city_forecast(city):
     try:
-        return jsonify([])
+        # 5 günlük tahmin mock verisi
+        return jsonify([
+            {"day": "Pazartesi", "temp": "29°C", "condition": "Güneşli"},
+            {"day": "Salı", "temp": "31°C", "condition": "Bulutlu"},
+            {"day": "Çarşamba", "temp": "28°C", "condition": "Yağmurlu"},
+            {"day": "Perşembe", "temp": "30°C", "condition": "Güneşli"},
+            {"day": "Cuma", "temp": "32°C", "condition": "Güneşli"}
+        ])
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+@app.route('/api/earthquakes')
+def get_earthquakes():
+    try:
+        # Kandilli / AFAD benzeri örnek deprem verisi
+        return jsonify([
+            {"title": "Adana - Kozan", "mag": "3.4", "date": "2026-07-27 21:00:00", "depth": "7.0 km"}
+        ])
     except Exception as e:
         return jsonify({"error": str(e)})
 
