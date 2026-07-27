@@ -48,7 +48,7 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
 
 @app.route('/')
 def index():
-    return render_template('index.html', kameralar=kameralar)
+kameralar = []
 
 @app.route('/api')
 def get_depremler():
