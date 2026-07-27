@@ -2,88 +2,34 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SİBER RADAR - Canlı Deprem & Hava Durumu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SİBER RADAR</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        /* Pop-up Özel Stilleri */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(5px);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 99999;
+            align-items: center; justify-content: center;
         }
         .modal-card {
-            background: #111827;
-            border: 1px solid #374151;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 420px;
-            box-shadow: 0 10px 25px rgba(0,255,204,0.15);
-            overflow: hidden;
-            position: relative;
-            animation: modalFadeIn 0.3s ease-out;
-        }
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+            background: #111827; border: 1px solid #00ffcc; border-radius: 12px;
+            width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(0,255,204,0.3);
+            overflow: hidden; position: relative; color: #fff; font-family: sans-serif;
         }
         .modal-header {
-            padding: 12px 16px;
-            background: #1f2937;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #374151;
-            color: #00ffcc;
-            font-weight: bold;
+            padding: 12px 16px; background: #1f2937; display: flex;
+            justify-content: space-between; align-items: center; border-bottom: 1px solid #374151;
+            color: #00ffcc; font-weight: bold; font-size: 14px;
         }
-        .modal-body {
-            max-height: 320px;
-            overflow-y: auto;
-            padding: 10px;
-        }
+        .modal-body { max-height: 300px; overflow-y: auto; padding: 10px; }
         .visitor-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            margin-bottom: 6px;
-            background: #1f2937;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #e5e7eb;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 12px; margin-bottom: 6px; background: #1f2937; border-radius: 6px; font-size: 13px;
         }
-        .timer-bar-container {
-            width: 100%;
-            height: 4px;
-            background: #374151;
-        }
-        .timer-bar {
-            height: 100%;
-            background: #ff0055;
-            width: 100%;
-            transition: width 10s linear;
-        }
-        .btn-log {
-            background: #111827;
-            color: #00ffcc;
-            border: 1px solid #00ffcc;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-log:hover {
-            background: #00ffcc;
-            color: #111827;
-        }
+        .timer-bar-container { width: 100%; height: 4px; background: #374151; }
+        .timer-bar { height: 100%; background: #ff0055; width: 100%; transition: width 10s linear; }
     </style>
 </head>
 <body>
@@ -93,21 +39,57 @@
             <small>📷 @totik.01</small>
         </div>
         <div class="menu-grid">
-            <button class="btn-log" onclick="acZiyaretciModal()">👥 LOG (50)</button>
+            <button class="btn-menu" onclick="toggleMenu('kameralar')">🎥 KAMERALAR</button>
+            <button class="btn-menu" onclick="toggleMenu('polen')">🌱 POLEN</button>
+            <button class="btn-menu" onclick="toggleMenu('risk')">📊 RİSK</button>
+            <button class="btn-menu" onclick="toggleMenu('yildirim')">⚡ YILDIRIM</button>
+            <button class="btn-menu" onclick="toggleMenu('tahmin5')">📅 5 GÜN</button>
+            <button class="btn-menu" onclick="toggleMenu('yagis')">☔ YAĞIŞ</button>
+            <button class="btn-menu" onclick="toggleMenu('canliYagis')">🌧️ CANLI YAĞIŞ</button>
+            <button class="btn-menu highlight" onclick="acZiyaretciModal()">👥 SİBER (LOG)</button>
         </div>
     </header>
 
-    <div id="map" style="height: 60vh; width: 100%;"></div>
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
 
-    <!-- ZİYARETÇİ POP-UP MODAL -->
+    <!-- HAVA DURUMU KARTLARI -->
+    <div class="weather-bar">
+        <div class="w-card" id="w-ist"><b>İSTANBUL</b><br><span class="val">--°C</span></div>
+        <div class="w-card" id="w-ank"><b>ANKARA</b><br><span class="val">--°C</span></div>
+        <div class="w-card" id="w-izm"><b>İZMİR</b><br><span class="val">--°C</span></div>
+        <div class="w-card" id="w-adn"><b>ADANA</b><br><span class="val">--°C</span></div>
+        <div class="w-card" id="w-mer"><b>MERSİN</b><br><span class="val">--°C</span></div>
+        <div class="w-card" id="w-ant"><b>ANTALYA</b><br><span class="val">--°C</span></div>
+        <div class="w-card" id="w-diy"><b>DİYARBAKIR</b><br><span class="val">--°C</span></div>
+        <div class="w-card" id="w-tra"><b>TRABZON</b><br><span class="val">--°C</span></div>
+        <div class="w-card" id="w-erz"><b>ERZURUM</b><br><span class="val">--°C</span></div>
+    </div>
+
+    <!-- SON DEPREM BİLGİSİ -->
+    <div class="last-eq-bar" id="last-eq">
+        <span>⏰ 📍 Yükleniyor...</span>
+    </div>
+
+    <!-- MODAL POPUP'LAR (MENÜLER İÇİN) -->
+    <div id="modal-kameralar" class="panel-modal"><div class="panel-content"><span class="close-btn" onclick="closeModals()">&times;</span><h3>🎥 CANLI KAMERALAR</h3><div id="kamera-listesi"></div></div></div>
+    <div id="modal-polen" class="panel-modal"><div class="panel-content"><span class="close-btn" onclick="closeModals()">&times;</span><h3>🌱 POLEN DURUMU</h3><p>🟢 Ağaç Poleni: Düşük<br>🟡 Çim Poleni: Orta<br>🔴 Ot Poleni: Yüksek</p></div></div>
+    <div id="modal-risk" class="panel-modal"><div class="panel-content"><span class="close-btn" onclick="closeModals()">&times;</span><h3>📊 BÖLGESEL RİSK</h3><div id="risk-data">Yükleniyor...</div></div></div>
+    <div id="modal-yildirim" class="panel-modal"><div class="panel-content"><span class="close-btn" onclick="closeModals()">&times;</span><h3>⚡ YILDIRIM TAKİBİ</h3><p>Son 1 saatte 142 yıldırım düşmesi tespit edildi.</p></div></div>
+    <div id="modal-tahmin5" class="panel-modal"><div class="panel-content"><span class="close-btn" onclick="closeModals()">&times;</span><h3>📅 ADANA 5 GÜNLÜK TAHMİN</h3><div id="tahmin5-data">Yükleniyor...</div></div></div>
+    <div id="modal-yagis" class="panel-modal"><div class="panel-content"><span class="close-btn" onclick="closeModals()">&times;</span><h3>☔ YAĞIŞ BEKLENTİSİ</h3><p>Önümüzdeki 3 saat içinde kritik yağış beklenmiyor.</p></div></div>
+    <div id="modal-canliYagis" class="panel-modal"><div class="panel-content"><span class="close-btn" onclick="closeModals()">&times;</span><h3>🌧️ CANLI YAĞIŞ RADARI</h3><div id="rain-data">Kontrol ediliyor...</div></div></div>
+
+    <!-- ZİYARETÇİ LOG MODAL -->
     <div id="ziyaretciModal" class="modal-overlay" onclick="kapatZiyaretciModal(event)">
         <div class="modal-card">
             <div class="timer-bar-container">
                 <div id="timerBar" class="timer-bar"></div>
             </div>
             <div class="modal-header">
-                <span>🌐 Son Ziyaretçiler (Canlı)</span>
-                <span style="cursor:pointer;" onclick="kapatZiyaretciModalForce()">&times;</span>
+                <span>🌐 Son Ziyaretçiler (50 Kişi)</span>
+                <span style="cursor:pointer; font-size:18px;" onclick="kapatZiyaretciModalForce()">&times;</span>
             </div>
             <div id="ziyaretciListesi" class="modal-body">
                 <div style="text-align:center; color:#9ca3af; padding:15px;">Yükleniyor...</div>
@@ -115,35 +97,67 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Harita Başlatma
         var map = L.map('map').setView([39.0, 35.0], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-        // Ziyaretçi Konum Kaydı
-        function kayitEtZiyaretci() {
-            fetch('https://ipapi.co/json/')
-                .then(r => r.json())
-                .then(d => {
-                    fetch('/api/record-visit', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            city: d.city || 'Bilinmeyen',
-                            country: d.country_name || 'Türkiye',
-                            flag: d.country_code ? `https://flagcdn.com/16x12/${d.country_code.toLowerCase()}.png` : '🇹🇷'
-                        })
+        // Depremleri Haritaya İşle
+        fetch('/api')
+            .then(r => r.json())
+            .then(data => {
+                if(data && data.length > 0) {
+                    var son = data[0];
+                    document.getElementById('last-eq').innerHTML = `⏰ 📍 <b>${son.yer}</b> <span style="background:#ff9900; color:#000; padding:2px 6px; border-radius:4px; font-weight:bold;">Şiddet: ${son.mag}</span>`;
+                    
+                    data.forEach(d => {
+                        L.circleMarker([d.lat, d.lng], {
+                            radius: d.mag * 3,
+                            color: d.mag >= 4 ? '#ff0055' : '#ff9900',
+                            fillColor: d.mag >= 4 ? '#ff0055' : '#ff9900',
+                            fillOpacity: 0.6
+                        }).addTo(map).bindPopup(`<b>${d.yer}</b><br>Büyüklük: ${d.mag}<br>Zaman: ${d.zaman}`);
                     });
-                }).catch(() => {});
+                }
+            });
+
+        // Hava Durumunu Güncelle
+        fetch('/api/weather')
+            .then(r => r.json())
+            .then(data => {
+                data.forEach(s => {
+                    var el = document.getElementById(s.panel);
+                    if(el) {
+                        el.innerHTML = `<b>${s.isim}</b><br><span class="val">${s.anlik}°C</span> 🌡️${s.hissedilen}°C 💧%${s.nem}`;
+                    }
+                });
+            });
+
+        // Menü Aç/Kapat
+        function toggleMenu(id) {
+            closeModals();
+            var el = document.getElementById('modal-' + id);
+            if(el) el.style.display = 'flex';
         }
-        kayitEtZiyaretci();
+        function closeModals() {
+            var modals = document.querySelectorAll('.panel-modal');
+            modals.forEach(m => m.style.display = 'none');
+        }
 
-        // Pop-up Mantığı ve 10 Saniye Sayacı
+        // Ziyaretçi Kaydı
+        fetch('https://ipapi.co/json/').then(r=>r.json()).then(d=>{
+            fetch('/api/record-visit', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    city: d.city || 'Bilinmeyen',
+                    country: d.country_name || 'Türkiye',
+                    flag: d.country_code ? `https://flagcdn.com/16x12/${d.country_code.toLowerCase()}.png` : '🇹🇷'
+                })
+            });
+        }).catch(()=>{});
+
+        // Log Modal Sayacı
         var timerTimeout = null;
-
         function acZiyaretciModal() {
             var modal = document.getElementById('ziyaretciModal');
             var bar = document.getElementById('timerBar');
@@ -152,7 +166,6 @@
             liste.innerHTML = '<div style="text-align:center; color:#9ca3af; padding:15px;">Yükleniyor...</div>';
             modal.style.display = 'flex';
 
-            // Timer bar sıfırla ve animasyonu başlat
             bar.style.transition = 'none';
             bar.style.width = '100%';
             setTimeout(function() {
@@ -160,7 +173,6 @@
                 bar.style.width = '0%';
             }, 50);
 
-            // Verileri Çek
             fetch('/api/visitors')
                 .then(r => r.json())
                 .then(data => {
@@ -180,7 +192,6 @@
                     liste.innerHTML = html;
                 });
 
-            // 10 Saniye Sonra Otomatik Kapat
             clearTimeout(timerTimeout);
             timerTimeout = setTimeout(function() {
                 modal.style.display = 'none';
@@ -191,11 +202,8 @@
             document.getElementById('ziyaretciModal').style.display = 'none';
             clearTimeout(timerTimeout);
         }
-
         function kapatZiyaretciModal(e) {
-            if(e.target.id === 'ziyaretciModal') {
-                kapatZiyaretciModalForce();
-            }
+            if(e.target.id === 'ziyaretciModal') kapatZiyaretciModalForce();
         }
     </script>
 </body>
