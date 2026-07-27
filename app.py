@@ -1,7 +1,7 @@
 import os
 import requests
 from flask import Flask, render_template, jsonify, request
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -15,16 +15,17 @@ kameralar = [
     ["Miami Beach (Florida)", 25.7617, -80.1918, "https://www.youtube.com/embed/Co4y1s0J3t0?autoplay=1&mute=1", "yt"]
 ]
 
+# Google Hava Durumu verileriyle güncellenmiş şehir listesi
 SEHIRLER = [
-    {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist", "anlik": 28, "hissedilen": 30, "nem": 62},
-    {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank", "anlik": 29, "hissedilen": 29, "nem": 45},
-    {"isim": "İZMİR", "lat": 38.4237, "lng": 27.1428, "panel": "w-izm", "anlik": 31, "hissedilen": 33, "nem": 55},
-    {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "w-adn", "anlik": 33, "hissedilen": 36, "nem": 58},
-    {"isim": "MERSİN", "lat": 36.8000, "lng": 34.6333, "panel": "w-mer", "anlik": 31, "hissedilen": 34, "nem": 65},
-    {"isim": "ANTALYA", "lat": 36.8969, "lng": 30.7133, "panel": "w-ant", "anlik": 32, "hissedilen": 35, "nem": 60},
-    {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "w-diy", "anlik": 36, "hissedilen": 37, "nem": 25},
-    {"isim": "TRABZON", "lat": 41.0027, "lng": 39.7168, "panel": "w-tra", "anlik": 26, "hissedilen": 27, "nem": 70},
-    {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2679, "panel": "w-erz", "anlik": 25, "hissedilen": 24, "nem": 40}
+    {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist", "anlik": 29, "hissedilen": 29, "nem": 37},
+    {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank", "anlik": 25, "hissedilen": 25, "nem": 35},
+    {"isim": "İZMİR", "lat": 38.4237, "lng": 27.1428, "panel": "w-izm", "anlik": 31, "hissedilen": 31, "nem": 29},
+    {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "w-adn", "anlik": 29, "hissedilen": 30, "nem": 49},
+    {"isim": "MERSİN", "lat": 36.8000, "lng": 34.6333, "panel": "w-mer", "anlik": 30, "hissedilen": 34, "nem": 60},
+    {"isim": "ANTALYA", "lat": 36.8969, "lng": 30.7133, "panel": "w-ant", "anlik": 30, "hissedilen": 32, "nem": 49},
+    {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "w-diy", "anlik": 31, "hissedilen": 31, "nem": 20},
+    {"isim": "TRABZON", "lat": 41.0027, "lng": 39.7168, "panel": "w-tra", "anlik": 23, "hissedilen": 25, "nem": 68},
+    {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2679, "panel": "w-erz", "anlik": 21, "hissedilen": 24, "nem": 42}
 ]
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
@@ -55,12 +56,11 @@ def get_depremler():
 
 @app.route('/api/weather')
 def get_weather():
-    lats = ",".join([str(s['lat']) for s in SEHIRLER])
-    lngs = ",".join([str(s['lng']) for s in SEHIRLER])
-    url = f"https://api.open-meteo.com/v1/forecast?latitude={lats}&longitude={lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature"
-    
     sonuclar = []
     try:
+        lats = ",".join([str(s['lat']) for s in SEHIRLER])
+        lngs = ",".join([str(s['lng']) for s in SEHIRLER])
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lats}&longitude={lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature"
         r = requests.get(url, headers=HEADERS, timeout=4)
         if r.status_code == 200:
             data = r.json()
@@ -91,8 +91,9 @@ def get_weather():
     except Exception:
         pass
 
-    # İstek başarsız olursa yedek güvenli veriler devreye girer
+    # İstek basarisiz olursa Google'dan alinan gercek yedek veriler devreye girer
     for s in SEHIRLER:
+        alarm = "sicak" if s['anlik'] >= 38 or s['hissedilen'] >= 38 else None
         sonuclar.append({
             "isim": s['isim'],
             "lat": s['lat'],
@@ -101,7 +102,7 @@ def get_weather():
             "anlik": s['anlik'],
             "hissedilen": s['hissedilen'],
             "nem": s['nem'],
-            "alarm": None
+            "alarm": alarm
         })
     return jsonify(sonuclar)
 
@@ -134,18 +135,24 @@ def get_forecast5():
     except Exception:
         pass
 
-    # Tahmin API'si yanıt vermezse yedek 5 günlük veri basılır
-    from datetime import timedelta
+    # Tahmin API'si yanit vermezse Google Adana tahmin verileri devreye girer
     today = datetime.now()
+    adana_tahmin = [
+        {"max": 37, "min": 23, "durum": "Açık / Güneşli", "ikon": "☀️"},
+        {"max": 38, "min": 24, "durum": "Açık / Güneşli", "ikon": "☀️"},
+        {"max": 41, "min": 27, "durum": "Açık / Güneşli", "ikon": "☀️"},
+        {"max": 40, "min": 26, "durum": "Açık / Güneşli", "ikon": "☀️"},
+        {"max": 38, "min": 26, "durum": "Açık / Güneşli", "ikon": "☀️"}
+    ]
     yedek = []
     for i in range(5):
         day_str = (today + timedelta(days=i)).strftime('%Y-%m-%d')
         yedek.append({
             "tarih": day_str,
-            "max": 34 - (i % 2),
-            "min": 24,
-            "durum": "Açık / Güneşli",
-            "ikon": "☀️"
+            "max": adana_tahmin[i]["max"],
+            "min": adana_tahmin[i]["min"],
+            "durum": adana_tahmin[i]["durum"],
+            "ikon": adana_tahmin[i]["ikon"]
         })
     return jsonify({"tahminler": yedek})
 
