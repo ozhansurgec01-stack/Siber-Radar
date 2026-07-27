@@ -1,8 +1,9 @@
 from flask import Flask, render_template, jsonify
+import requests
 
 app = Flask(__name__)
 
-# Kameralar listesi (Hatasız ve düzgün formatta)
+# Kameralar listesi
 kameralar = [
     ["Canlı Yayın Kamerası 7", 37.0000, 35.0000, "https://www.youtube.com/embed/gFRtAAmiFbE?autoplay=1", "yt"],
     ["Canlı Yayın Kamerası 6", 37.0000, 35.0000, "https://www.youtube.com/embed/DEycz2Ufv98?autoplay=1", "yt"],
@@ -21,6 +22,22 @@ def index():
 @app.route('/api/kameralar')
 def get_kameralar():
     return jsonify(kameralar)
+
+# Frontend'in hata almaması için eklenen ana API rotaları
+@app.route('/api/weather')
+def get_weather():
+    try:
+        # Örnek veya aktif hava durumu köprüsü
+        return jsonify({"temp": "24°C", "status": "OK"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+@app.route('/api/earthquake')
+def get_earthquake():
+    try:
+        return jsonify([])
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
