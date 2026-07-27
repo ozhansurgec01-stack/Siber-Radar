@@ -384,15 +384,22 @@
         depremleriYenile();
         setInterval(depremleriYenile, 60000);
 
+        let pollenTimer = null;
         function polenAlarmGoster() {
             let b = document.getElementById("pollen-banner");
             let btn = document.getElementById("pollenBtn");
             if (b.style.display === "none" || b.style.display === "") {
                 b.style.display = "block";
                 btn.classList.add("active-mgm");
+                if (pollenTimer) clearTimeout(pollenTimer);
+                pollenTimer = setTimeout(() => {
+                    b.style.display = "none";
+                    btn.classList.remove("active-mgm");
+                }, 10000);
             } else {
                 b.style.display = "none";
                 btn.classList.remove("active-mgm");
+                if (pollenTimer) clearTimeout(pollenTimer);
             }
         }
 
