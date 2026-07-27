@@ -9,7 +9,11 @@ ziyaretciler = []
 
 # 4 Yabancı Kamera
 kameralar = [
-    ["Times Square Canlı Yayın (New York)", 40.7580, -73.9855, "https://www.youtube.com/embed/1-iS8LArMPA?autoplay=1&mute=1", "yt"],
+    ["Times Square New York", 40.7580, -73.9855, "https://www.youtube.com/embed/lM3khCaiDos?autoplay=1", "yt"],
+    ["EarthCam Dublin, Ireland", 53.3498, -6.2603, "https://www.youtube.com/embed/3nyPER2kzqk?autoplay=1", "yt"],
+    ["Times Square Cam 2", 40.7580, -73.9855, "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1", "yt"],
+    ["International Live Stream", 40.7128, -74.0060, "https://www.youtube.com/embed/zfSst64NFcE?autoplay=1", "yt"]
+],
     ["Shibuya Crossing (Tokyo)", 35.6595, 139.7004, "https://www.youtube.com/embed/36YnV9STBqc?autoplay=1&mute=1", "yt"],
     ["Piccadilly Circus (Londra)", 51.5100, -0.1347, "https://www.youtube.com/embed/gFRtAAmiFbE?autoplay=1&mute=1", "yt"],
     ["Miami Beach (Florida)", 25.7617, -80.1918, "https://www.youtube.com/embed/Co4y1s0J3t0?autoplay=1&mute=1", "yt"]
