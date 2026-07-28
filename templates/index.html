@@ -117,14 +117,17 @@
     <div class="top-nav">
         <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;">📡 SİBER RADAR</div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:13px; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
         <div class="nav-buttons">
-            <button class="toggle-btn" id="camListBtn" onclick="togglePanel('cam')">🎥 KAMERALAR</button>
-            <button class="toggle-btn" id="pollenBtn" onclick="polenAlarmGoster()">🌱 POLEN</button>
-            <button class="toggle-btn" id="riskBtn" onclick="riskGoster()">📊 RİSK</button>
-            <button class="toggle-btn" id="yildirimBtn" onclick="toggleRadarLayer('yildirim')">⚡ YILDIRIM</button>
-            <button class="toggle-btn" id="mgmBtn" onclick="togglePanel('mgm')">📅 5 GÜN</button>
-            <button class="toggle-btn" id="meteoBtn" onclick="toggleRadarLayer('meteo')">☔ YAĞIŞ</button>
-            <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
-            <button class="toggle-btn" id="modeBtn" onclick="toggleMod()">KLASİK</button>
+            <button class="toggle-btn" id="camList">KAMERALAR</button>
+            <button class="toggle-btn" id="pollen">POLEN</button>
+            <button class="toggle-btn" id="riskBtn">RİSK</button>
+            <button class="toggle-btn" id="yildirimBtn">YILDIRIM (AÇIK)</button>
+            <button id="ziyaretciBtn" class="toggle-btn" onclick="ziyaretcileriGoster()" style="background: linear-gradient(135deg, #ff7e5f, #feb47b); color: white; display: inline-flex; align-items: center; gap: 4px;">
+                👥 <span id="ziyaretciSayisiBadge">0</span>
+            </button>
+            <button class="toggle-btn" id="mgmBtn">5 GÜN</button>
+            <button class="toggle-btn" id="meteoBtn">YAĞIŞ (AÇIK)</button>
+            <button class="toggle-btn" id="liveRain">CANLI YAĞIŞ</button>
+            <button class="toggle-btn" id="modeBtn">SİBER</button>
         </div>
     </div>
 
