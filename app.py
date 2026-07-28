@@ -60,11 +60,11 @@ def weather():
         app_temp = s["hissedilen"]
         hum = s["nem"]
         
-        # Haritadaki sıcaklık/soğukluk katmanı için alarm parametresi
+        # Sıcaklık alarm eşiği 38°C olarak ayarlandı
         alarm = None
-        if temp >= 24.0:
+        if temp >= 38.0:
             alarm = 'sicak'
-        elif temp <= 15.0:
+        elif temp <= -5.0:
             alarm = 'soguk'
             
         sonuc.append({
