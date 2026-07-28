@@ -215,3 +215,32 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port)
 
 
+
+@app.route('/api/storm')
+def get_storm():
+    return jsonify([
+        {
+            "isim":"İSTANBUL",
+            "lat":41.0082,
+            "lng":28.9784,
+            "durum":"normal",
+            "ruzgar":20,
+            "renk":"green"
+        },
+        {
+            "isim":"İZMİR",
+            "lat":38.4237,
+            "lng":27.1428,
+            "durum":"kuvvetli rüzgar",
+            "ruzgar":55,
+            "renk":"orange"
+        },
+        {
+            "isim":"TRABZON",
+            "lat":41.0027,
+            "lng":39.7168,
+            "durum":"fırtına",
+            "ruzgar":75,
+            "renk":"red"
+        }
+    ])
