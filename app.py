@@ -60,7 +60,6 @@ def weather():
         app_temp = s["hissedilen"]
         hum = s["nem"]
         
-        # Sıcaklık alarm eşiği 38°C olarak ayarlandı
         alarm = None
         if temp >= 38.0:
             alarm = 'sicak'
@@ -81,12 +80,13 @@ def weather():
 
 @app.route('/api/forecast5')
 def forecast5():
+    # Frontend (JS) tarafının doğrudan okuyabilmesi için hem 'tarih' hem de 'gun' anahtarları eklendi
     tahminler = [
-        {"tarih": "2026-07-28", "max": 38, "min": 23, "ikon": "☀️"},
-        {"tarih": "2026-07-29", "max": 41, "min": 27, "ikon": "☀️"},
-        {"tarih": "2026-07-30", "max": 39, "min": 26, "ikon": "☀️"},
-        {"tarih": "2026-07-31", "max": 37, "min": 25, "ikon": "☀️"},
-        {"tarih": "2026-08-01", "max": 38, "min": 26, "ikon": "☀️"}
+        {"tarih": "2026-07-28", "gun": "2026-07-28", "max": 38, "min": 23, "ikon": "☀️"},
+        {"tarih": "2026-07-29", "gun": "2026-07-29", "max": 41, "min": 27, "ikon": "☀️"},
+        {"tarih": "2026-07-30", "gun": "2026-07-30", "max": 39, "min": 26, "ikon": "☀️"},
+        {"tarih": "2026-07-31", "gun": "2026-07-31", "max": 37, "min": 25, "ikon": "☀️"},
+        {"tarih": "2026-08-01", "gun": "2026-08-01", "max": 38, "min": 26, "ikon": "☀️"}
     ]
     return jsonify({"tahminler": tahminler})
 
