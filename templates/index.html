@@ -5,7 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Siber Afet Radarı v18.7</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+function polenAlarmGoster() {
+    let polenPanel = document.getElementById('polen-banner') || document.querySelector('[id*="polen"]');
+    if(polenPanel) polenPanel.style.display = (polenPanel.style.display === 'none' || polenPanel.style.display === '') ? 'block' : 'none';
+}
+
+function riskGoster() {
+    let riskPanel = document.getElementById('risk-banner') || document.querySelector('[id*="risk"]');
+    if(riskPanel) riskPanel.style.display = (riskPanel.style.display === 'none' || riskPanel.style.display === '') ? 'block' : 'none';
+}
+
+function canliYagisKontrol() {
+    let canliBtn = document.getElementById('liveRainBtn');
+    if(canliBtn) canliBtn.classList.toggle('active-risik');
+    if(typeof toggleRadarLayer === 'function') toggleRadarLayer('meteo');
+}
+
+</script>
     <style>
         :root {
             --bg-main: #030712;
@@ -394,5 +411,22 @@ function havaDurumuArayuzunuGuncelle() {
 
 havaDurumuArayuzunuGuncelle();
 setInterval(havaDurumuArayuzunuGuncelle, 30000);
+
+function polenAlarmGoster() {
+    let polenPanel = document.getElementById('polen-banner') || document.querySelector('[id*="polen"]');
+    if(polenPanel) polenPanel.style.display = (polenPanel.style.display === 'none' || polenPanel.style.display === '') ? 'block' : 'none';
+}
+
+function riskGoster() {
+    let riskPanel = document.getElementById('risk-banner') || document.querySelector('[id*="risk"]');
+    if(riskPanel) riskPanel.style.display = (riskPanel.style.display === 'none' || riskPanel.style.display === '') ? 'block' : 'none';
+}
+
+function canliYagisKontrol() {
+    let canliBtn = document.getElementById('liveRainBtn');
+    if(canliBtn) canliBtn.classList.toggle('active-risik');
+    if(typeof toggleRadarLayer === 'function') toggleRadarLayer('meteo');
+}
+
 </script>
 </body>
