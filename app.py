@@ -40,43 +40,49 @@ def api():
             {'zaman': '2026-07-28 05:20:00', 'yer': 'Körfez - Adana Açıkları', 'mag': 3.1, 'lat': 36.75, 'lng': 35.20}
         ])
 
+
 @app.route('/api/weather')
 def weather():
     sehirler = [
-        {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist", "temp": 24.0, "hissedilen": 26.0, "nem": 67},
-        {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank", "temp": 16.0, "hissedilen": 16.0, "nem": 67},
-        {"isim": "İZMİR", "lat": 38.4192, "lng": 27.1287, "panel": "w-izm", "temp": 25.0, "hissedilen": 27.0, "nem": 65},
-        {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "w-adn", "temp": 39.0, "hissedilen": 42.0, "nem": 71}, # 38 eşiğini geçmesi için güncellendi
-        {"isim": "MERSİN", "lat": 36.8121, "lng": 34.6415, "panel": "w-mer", "temp": 26.0, "hissedilen": 29.0, "nem": 70},
-        {"isim": "ANTALYA", "lat": 36.8841, "lng": 30.7056, "panel": "w-ant", "temp": 27.0, "hissedilen": 30.0, "nem": 60},
-        {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "w-diy", "temp": 22.0, "hissedilen": 22.0, "nem": 50},
-        {"isim": "TRABZON", "lat": 41.0015, "lng": 39.7178, "panel": "w-tra", "temp": 22.0, "hissedilen": 25.0, "nem": 72},
-        {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2679, "panel": "w-erz", "temp": 15.0, "hissedilen": 15.0, "nem": 68}
+        {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "istanbul"},
+        {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "ankara"},
+        {"isim": "İZMİR", "lat": 38.4192, "lng": 27.1287, "panel": "izmir"},
+        {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "adana"},
+        {"isim": "MERSİN", "lat": 36.8121, "lng": 34.6415, "panel": "mersin"},
+        {"isim": "ANTALYA", "lat": 36.8841, "lng": 30.7056, "panel": "antalya"},
+        {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "diyarbakir"},
+        {"isim": "TRABZON", "lat": 41.0015, "lng": 39.7178, "panel": "trabzon"},
+        {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2729, "panel": "erzurum"}
     ]
-    
+
     sonuc = []
     for s in sehirler:
-        temp = s["temp"]
-        app_temp = s["hissedilen"]
-        hum = s["nem"]
-        
-        # 38 derece eşiği kontrolü
-        alarm = 'sicak' if temp >= 38.0 else ('soguk' if temp <= -5.0 else None)
-            
+        try:
+            url = f"https://api.open-meteo.com/v1/forecast?latitude={s['lat']}&longitude={s['lng']}&current=temperature_2m,relative_humidity_2m,apparent_temperature"
+            res = requests.get(url, timeout=3)
+            data = res.json().get('current', {})
+            temp = round(data.get('temperature_2m', 25))
+            app_temp = round(data.get('apparent_temperature', temp + 2))
+            hum = round(data.get('relative_humidity_2m', 50))
+        except Exception as e:
+            temp, app_temp, hum = 25, 27, 50
+
+        alarm = 'sicak' if temp >= 38.0 else ('soguk' if temp <= 0 else 'normal')
+
         sonuc.append({
             "isim": s["isim"],
             "lat": s["lat"],
             "lng": s["lng"],
             "panel": s["panel"],
+            "sicaklik": temp,
             "anlik": temp,
-            "sicaklik": temp, # Frontend olası 'sicaklik' anahtarını arıyorsa diye eklendi
             "hissedilen": app_temp,
             "nem": hum,
             "alarm": alarm
         })
-    
-    # Frontend bazen doğrudan dizi bazen de obje içinde liste bekleyebiliyor, her ikisini de destekleyelim
+
     return jsonify(sonuc)
+
 
 @app.route('/api/forecast5')
 def forecast5():
