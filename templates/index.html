@@ -125,6 +125,7 @@
             <button class="toggle-btn" id="mgmBtn" onclick="togglePanel('mgm')">📅 5 GÜN</button>
             <button class="toggle-btn" id="meteoBtn" onclick="toggleRadarLayer('meteo')">☔ YAĞIŞ</button>
             <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
+<button class="toggle-btn" id="stormBtn" onclick="firtinaGoster()">🌪️ FIRTINA</button>
 <button class="toggle-btn" id="tempBtn" onclick="toggleSicaklik()">🌡️ SICAKLIK</button>
 <button class="toggle-btn" onclick="polenGoster()">🌿 POLEN</button>
             <button class="toggle-btn" id="modeBtn" onclick="toggleMod()">KLASİK</button>
@@ -466,5 +467,50 @@ function toggleSicaklik(){
     ).addTo(map);
 
     btn.innerHTML="🌡️ SICAKLIK (AÇIK)";
+}
+</script>
+
+<script>
+let firtinaLayer = L.layerGroup().addTo(map);
+
+function firtinaGoster(){
+
+    firtinaLayer.clearLayers();
+
+    fetch('/api/storm')
+    .then(r=>r.json())
+    .then(data=>{
+
+        data.forEach(x=>{
+
+            let renk = x.renk || "green";
+
+            let icon = L.divIcon({
+                className:"",
+                html:`<div style="
+                background:${renk};
+                width:22px;
+                height:22px;
+                border-radius:50%;
+                border:2px solid white;
+                box-shadow:0 0 10px ${renk};
+                "></div>`,
+                iconSize:[22,22]
+            });
+
+            let marker=L.marker([x.lat,x.lng],{icon:icon})
+            .addTo(firtinaLayer);
+
+            marker.bindPopup(`
+            <b>🌪️ FIRTINA DURUMU</b><br>
+            📍 ${x.isim}<br>
+            💨 Rüzgar: ${x.ruzgar} km/s<br>
+            🌡️ Sıcaklık: ${x.sicaklik}°C<br>
+            ⚠️ Durum: ${x.durum}
+            `);
+
+        });
+
+    });
 }
 </script>
