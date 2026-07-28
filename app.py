@@ -63,11 +63,9 @@ ziyaretciler = []
         35.482,
         "https://www.youtube.com/embed/whIxfJ1IPoU?autoplay=1",
         "yt"
-    ]
 ],
     ["Piccadilly Circus (Londra)", 51.5100, -0.1347, "https://www.youtube.com/embed/gFRtAAmiFbE?autoplay=1&mute=1", "yt"],
     ["Miami Beach (Florida)", 25.7617, -80.1918, "https://www.youtube.com/embed/Co4y1s0J3t0?autoplay=1&mute=1", "yt"]
-]
 
 # Google Hava Durumu verileriyle güncellenmiş şehir listesi
 SEHIRLER = [
