@@ -1,139 +1,118 @@
 from flask import Flask, render_template, jsonify
 import requests
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Orijinal Kameraların ve İstasyonların Tam Listesi
-KAMERALAR = [
-    ["Adana AFAD Merkezi", 37.0000, 35.3213, "https://www.youtube.com/embed/live_stream?channel=UC_example1", "yt"],
-    ["Hatay Sismik İstasyonu", 36.2000, 36.1600, "", "radar"],
-    ["Osmaniye Canlı Kamera", 37.0742, 36.2478, "https://www.youtube.com/embed/live_stream?channel=UC_example2", "yt"],
-    ["Mersin Sahil Gözlem", 36.8000, 34.6333, "https://www.youtube.com/embed/live_stream?channel=UC_example3", "yt"],
-    ["Kahramanmaraş Trafik", 37.5858, 36.9371, "https://www.youtube.com/embed/live_stream?channel=UC_example4", "yt"],
-    ["Gaziantep Canlı Gözlem", 37.0662, 37.3833, "https://www.youtube.com/embed/live_stream?channel=UC_example5", "yt"]
+kameralar = [
+    ["Canlı Yayın Kamerası 7", 37.0000, 35.0000, "https://www.youtube.com/embed/gFRtAAmiFbE?autoplay=1", "yt"],
+    ["Canlı Yayın Kamerası 6", 37.0000, 35.0000, "https://www.youtube.com/embed/DEycz2Ufv98?autoplay=1", "yt"],
+    ["Canlı Yayın Kamerası 5", 40.7580, -73.9855, "https://www.youtube.com/embed/zfSst64NFcE?autoplay=1", "yt"],
+    ["Canlı Yayın Kamerası 4", 37.0000, 35.3213, "https://www.youtube.com/embed/16hHfZzf8-I?autoplay=1", "yt"],
+    ["Canlı Yayın Kamerası 3", 37.0000, 35.3213, "https://www.youtube.com/embed/EO_1LWqsCNE?autoplay=1", "yt"],
+    ["EarthCam Dublin Canlı Yayın", 53.3498, -6.2603, "https://www.youtube.com/embed/3nyPER2kzqk?autoplay=1", "yt"],
+    ["Times Square Canlı Yayın 2", 40.7580, -73.9855, "https://www.youtube.com/embed/lM3khCaiDos?autoplay=1", "yt"],
+    ["YouTube Canlı Yayın Kamerası", 38.7225, 35.4820, "https://www.youtube.com/embed/whIxfJ1IPoU?autoplay=1", "yt"]
 ]
 
-@app.route('/api')
-def api_depremler():
-    try:
-        url = "https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
-        res = requests.get(url, timeout=3)
-        data = res.json()
-        if data and "result" in data:
-            depremler = []
-            for item in data["result"][:30]:
-                depremler.append({
-                    "lat": float(item["geojson"]["coordinates"][1]),
-                    "lng": float(item["geojson"]["coordinates"][0]),
-                    "mag": float(item["mag"]),
-                    "yer": item["title"],
-                    "zaman": item["date"]
-                })
-            return jsonify(depremler)
-    except:
-        pass
-    return jsonify([
-        {"lat": 37.12, "lng": 36.45, "mag": 3.4, "yer": "İslahiye (Gaziantep)", "zaman": "2026-07-28 06:10:00"},
-        {"lat": 36.85, "lng": 35.75, "mag": 3.1, "yer": "Körfez - Adana Açıkları", "zaman": "2026-07-28 05:20:00"}
-    ])
+@app.route('/')
+def index():
+    return render_template('index.html', kameralar=kameralar)
 
-@app.route('/api/forecast5')
-def api_forecast():
+@app.route('/api')
+def api():
     try:
-        owm_url = "https://api.openweathermap.org/data/2.5/forecast?lat=37.00&lon=35.32&units=metric&lang=tr&appid=43ea6ba77a33cd1e0b37266634f1e949"
-        res = requests.get(owm_url, timeout=4)
+        url = "https://earthquake.kandilli.tr/api/kandilli/latest"
+        res = requests.get(url, timeout=5)
         data = res.json()
-        tahminler = []
-        if "list" in data:
-            islenen_gunler = set()
-            for item in data["list"]:
-                tarih_str = item["dt_txt"]
-                gun = tarih_str.split(" ")[0]
-                saat = tarih_str.split(" ")[1]
-                if "12:00:00" in saat and gun not in islenen_gunler and len(tahminler) < 5:
-                    islenen_gunler.add(gun)
-                    desc = item["weather"][0]["description"].capitalize()
-                    icon_code = item["weather"][0]["icon"]
-                    ikon = "☀️" if "01" in icon_code else ("⛅" if "02" in icon_code or "03" in icon_code else "🌧️")
-                    tahminler.append({
-                        "tarih": gun,
-                        "durum": desc,
-                        "min": round(item["main"]["temp_min"]),
-                        "max": round(item["main"]["temp_max"]),
-                        "ikon": ikon
-                    })
-        return jsonify({"tahminler": tahminler})
+        depremler = []
+        for d in data.get('result', [])[:15]:
+            depremler.append({
+                'zaman': d.get('date', ''),
+                'yer': d.get('title', ''),
+                'mag': float(d.get('mag', 0)),
+                'lat': float(d.get('lat', 0)),
+                'lng': float(d.get('lng', 0))
+            })
+        return jsonify(depremler)
     except:
-        return jsonify({"tahminler": [{"tarih": "Bugün", "durum": "Parçalı Bulutlu", "min": 24, "max": 35, "ikon": "☀️"}]})
+        return jsonify([
+            {'zaman': '2026-07-28 06:10:00', 'yer': 'İslahiye (Gaziantep)', 'mag': 3.4, 'lat': 37.02, 'lng': 36.63},
+            {'zaman': '2026-07-28 05:20:00', 'yer': 'Körfez - Adana Açıkları', 'mag': 3.1, 'lat': 36.75, 'lng': 35.20}
+        ])
 
 @app.route('/api/weather')
-def api_weather():
+def weather():
     sehirler = [
-        {"isim": "İstanbul", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist"},
-        {"isim": "Ankara", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank"},
-        {"isim": "İzmir", "lat": 38.4192, "lng": 27.1287, "panel": "w-izm"},
-        {"isim": "Adana", "lat": 37.0000, "lng": 35.3213, "panel": "w-adn"},
-        {"isim": "Mersin", "lat": 36.8000, "lng": 34.6333, "panel": "w-mer"},
-        {"isim": "Antalya", "lat": 36.8969, "lng": 30.7133, "panel": "w-ant"},
-        {"isim": "Diyarbakır", "lat": 37.9144, "lng": 40.2306, "panel": "w-diy"},
-        {"isim": "Trabzon", "lat": 41.0015, "lng": 39.7178, "panel": "w-tra"},
-        {"isim": "Erzurum", "lat": 39.9043, "lng": 41.2679, "panel": "w-erz"}
+        {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist"},
+        {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank"},
+        {"isim": "İZMİR", "lat": 38.4192, "lng": 27.1287, "panel": "w-izm"},
+        {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "w-adn"},
+        {"isim": "MERSİN", "lat": 36.8121, "lng": 34.6415, "panel": "w-mer"},
+        {"isim": "ANTALYA", "lat": 36.8841, "lng": 30.7056, "panel": "w-ant"},
+        {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "w-diy"},
+        {"isim": "TRABZON", "lat": 41.0015, "lng": 39.7178, "panel": "w-tra"},
+        {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2679, "panel": "w-erz"}
     ]
     
     sonuc = []
     for s in sehirler:
         try:
-            url = f"https://api.openweathermap.org/data/2.5/weather?lat={s['lat']}&lon={s['lng']}&units=metric&lang=tr&appid=43ea6ba77a33cd1e0b37266634f1e949"
-            res = requests.get(url, timeout=3).json()
-            temp = round(res["main"]["temp"])
-            feels = round(res["main"]["feels_like"])
-            humidity = res["main"]["humidity"]
+            api_url = f"https://api.open-meteo.com/v1/forecast?latitude={s['lat']}&longitude={s['lng']}&current=temperature_2m,relative_humidity_2m,apparent_temperature"
+            res = requests.get(api_url, timeout=3).json()
+            curr = res.get('current', {})
+            temp = curr.get('temperature_2m', 25.0)
+            hum = curr.get('relative_humidity_2m', 50)
+            app_temp = curr.get('apparent_temperature', temp)
             
             alarm = None
-            if temp >= 33:
-                alarm = "sicak"
-            elif temp <= 3:
-                alarm = "soguk"
+            if temp >= 35.0:
+                alarm = 'sicak'
+            elif temp <= 0.0:
+                alarm = 'soguk'
                 
             sonuc.append({
                 "isim": s["isim"],
                 "lat": s["lat"],
                 "lng": s["lng"],
                 "panel": s["panel"],
-                "anlik": temp,
-                "hissedilen": feels,
-                "nem": humidity,
+                "anlik": round(temp, 1),
+                "hissedilen": round(app_temp, 1),
+                "nem": hum,
                 "alarm": alarm
             })
         except:
             sonuc.append({
-                "isim": s["isim"],
-                "lat": s["lat"],
-                "lng": s["lng"],
-                "panel": s["panel"],
-                "anlik": 25,
-                "hissedilen": 26,
-                "nem": 50,
-                "alarm": None
+                "isim": s["isim"], "lat": s["lat"], "lng": s["lng"], "panel": s["panel"],
+                "anlik": 25.0, "hissedilen": 26.0, "nem": 50, "alarm": None
             })
     return jsonify(sonuc)
 
+@app.route('/api/forecast5')
+def forecast5():
+    try:
+        url = "https://api.open-meteo.com/v1/forecast?latitude=37.0000&longitude=35.3213&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Europe/Istanbul"
+        res = requests.get(url, timeout=3).json()
+        daily = res.get('daily', {})
+        tahminler = []
+        tarihler = daily.get('time', [])
+        maxlar = daily.get('temperature_2m_max', [])
+        minler = daily.get('temperature_2m_min', [])
+        
+        for i in range(min(5, len(tarihler))):
+            tahminler.append({
+                "tarih": tarihler[i],
+                "max": maxlar[i],
+                "min": minler[i],
+                "ikon": "☀️" if maxlar[i] > 30 else "🌤️"
+            })
+        return jsonify({"tahminler": tahminler})
+    except:
+        return jsonify({"tahminler": []})
+
 @app.route('/api/risk')
-def api_risk():
+def risk():
     return jsonify({"dusuk": 65, "orta": 25, "yuksek": 10})
 
-@app.route('/api/rain-check')
-def api_rain_check():
-    return jsonify({
-        "yerler": [
-            {"il": "Adana", "ilce": "Merkez", "durum": "Hafif Yağış"},
-            {"il": "Mersin", "ilce": "Tarsus", "durum": "Yağmurlu"}
-        ]
-    })
-
-@app.route('/')
-def index():
-    return render_template('index.html', kameralar=KAMERALAR)
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
