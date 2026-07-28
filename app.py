@@ -1,3 +1,14 @@
+
+import json
+import os
+
+# Kameralari disaridan kameralar.json dosyasindan dinamik yukle (Indentation hatasi olmasin)
+if os.path.exists("kameralar.json"):
+    with open("kameralar.json", "r", encoding="utf-8") as f:
+        kameralar = json.load(f)
+else:
+    kameralar = []
+
 import os
 import requests
 from flask import Flask, render_template, jsonify, request
@@ -8,14 +19,7 @@ app = Flask(__name__)
 ziyaretciler = []
 
 # 4 Yabancı Kamera
-kameralar = [
-    [
-        "Canlı Yayın Kamerası 7",
-        37.0,
-        35.0,
-        "https://www.youtube.com/embed/gFRtAAmiFbE?autoplay=1",
-        "yt"
-    ],
+,
     [
         "Canlı Yayın Kamerası 6",
         37.0,
