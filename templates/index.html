@@ -476,7 +476,6 @@ let firtinaLayer = L.layerGroup().addTo(map);
 function firtinaGoster(){
 
     firtinaLayer.clearLayers();
-    map.setView([39,35],6);
 
     fetch('/api/storm')
     .then(r=>r.json())
