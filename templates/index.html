@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Siber Afet Radarı v18.7</title>
+    <title>Siber Afet Radarı v18.9</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -76,13 +76,25 @@
         .cam-dropdown-item { cursor: pointer; border: 1px solid rgba(0, 236, 255, 0.2); transition: all 0.2s; }
         .cam-dropdown-item:hover { background: rgba(0, 236, 255, 0.15); }
         .weather-panel {
-            background-color: var(--bg-panel); padding: 8px 10px; display: flex;
-            overflow-x: auto; white-space: nowrap; gap: 15px; flex-shrink: 0; z-index: 10;
-            scrollbar-width: none;
+            background-color: var(--bg-panel); padding: 8px 12px; display: flex;
+            overflow-x: auto; white-space: nowrap; gap: 18px; flex-shrink: 0; z-index: 10;
+            scrollbar-width: none; align-items: center;
         }
         .weather-panel::-webkit-scrollbar { display: none; }
-        .weather-item { font-size: 11px; font-weight: bold; color: var(--weather-text); font-family: monospace; display: inline-block; min-width: 140px; text-align: center; }
-        .weather-item b { color: var(--text-eq-title); display: block; font-size: 11px; margin-top: 2px; }
+        .weather-item {
+            font-size: 11px; font-weight: bold; color: var(--weather-text); font-family: monospace;
+            display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+            min-width: 150px; text-align: center; flex-shrink: 0;
+        }
+        .weather-item b { color: var(--text-eq-title); display: block; font-size: 11px; margin-top: 3px; }
+        
+        @keyframes flameGlow {
+            0% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 2px #ff4500); }
+            50% { transform: scale(1.3) translateY(-2px) rotate(-6deg); filter: drop-shadow(0 0 10px #ff0000); }
+            100% { transform: scale(1.1) translateY(0) rotate(6deg); filter: drop-shadow(0 0 5px #ffaa00); }
+        }
+        .flame-icon { display: inline-block; animation: flameGlow 0.6s infinite alternate ease-in-out; margin-right: 3px; }
+
         .bottom-area { flex: 1; position: relative; background-color: var(--bg-main); overflow: hidden; display: flex; flex-direction: column; border-top: var(--border-style); }
         #list { position: absolute; inset: 0; overflow-y: auto; padding: 15px; z-index: 1; }
         #cam-container { position: absolute; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; }
@@ -119,7 +131,9 @@
     <div class="top-nav">
         <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;">📡 SİBER RADAR</div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:13px; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
         <div class="nav-buttons">
+            <button class="toggle-btn" id="visitorBtn" onclick="ziyaretciDetayGoster()">👥 ...</button>
             <button class="toggle-btn" id="camListBtn" onclick="togglePanel('cam')">🎥 KAMERALAR</button>
+            <button class="toggle-btn" id="polenBtn" onclick="polenBilgiGoster()">🌱 POLEN</button>
             <button class="toggle-btn" id="riskBtn" onclick="riskGoster()">📊 RİSK</button>
             <button class="toggle-btn" id="yildirimBtn" onclick="toggleRadarLayer('yildirim')">⚡ YILDIRIM</button>
             <button class="toggle-btn" id="mgmBtn" onclick="togglePanel('mgm')">📅 5 GÜN</button>
@@ -149,15 +163,15 @@
     </div>
 
     <div class="weather-panel">
-        <div class="weather-item">🌤️ İSTANBUL<b id="w-ist">--</b></div>
-        <div class="weather-item">🏛️ ANKARA<b id="w-ank">--</b></div>
-        <div class="weather-item">🌊 İZMİR<b id="w-izm">--</b></div>
-        <div class="weather-item">☀️ ADANA<b id="w-adn">--</b></div>
-        <div class="weather-item">🌴 MERSİN<b id="w-mer">--</b></div>
-        <div class="weather-item">🔥 ANTALYA<b id="w-ant">--</b></div>
-        <div class="weather-item">🏜️ DİYARBAKIR<b id="w-diy">--</b></div>
-        <div class="weather-item">🌲 TRABZON<b id="w-tra">--</b></div>
-        <div class="weather-item">❄️ ERZURUM<b id="w-erz">--</b></div>
+        <div class="weather-item"><span><span id="icon-ist">🌤️</span> İSTANBUL</span><b id="w-ist">--</b></div>
+        <div class="weather-item"><span><span id="icon-ank">🏛️</span> ANKARA</span><b id="w-ank">--</b></div>
+        <div class="weather-item"><span><span id="icon-izm">🌊</span> İZMİR</span><b id="w-izm">--</b></div>
+        <div class="weather-item"><span><span id="icon-adn">☀️</span> ADANA</span><b id="w-adn">--</b></div>
+        <div class="weather-item"><span><span id="icon-mer">🌴</span> MERSİN</span><b id="w-mer">--</b></div>
+        <div class="weather-item"><span><span id="icon-ant">🏖️</span> ANTALYA</span><b id="w-ant">--</b></div>
+        <div class="weather-item"><span><span id="icon-diy">🏜️</span> DİYARBAKIR</span><b id="w-diy">--</b></div>
+        <div class="weather-item"><span><span id="icon-tra">🌲</span> TRABZON</span><b id="w-tra">--</b></div>
+        <div class="weather-item"><span><span id="icon-erz">❄️</span> ERZURUM</span><b id="w-erz">--</b></div>
     </div>
 
     <div class="bottom-area">
@@ -315,6 +329,12 @@
             document.getElementById('cam-frame').src = '';
         }
 
+        const varsayilanIkonlar = {
+            'w-ist': '🌤️', 'w-ank': '🏛️', 'w-izm': '🌊',
+            'w-adn': '☀️', 'w-mer': '🌴', 'w-ant': '🏖️',
+            'w-diy': '🏜️', 'w-tra': '🌲', 'w-erz': '❄️'
+        };
+
         function havaDurumuArayuzunuGuncelle() {
             fetch('/api/weather')
                 .then(res => res.json())
@@ -323,12 +343,31 @@
                     data.forEach(sehir => {
                         if (sehir.panel) {
                             let panelEl = document.getElementById(sehir.panel);
+                            let iconEl = document.getElementById(sehir.panel.replace('w-', 'icon-'));
+                            
                             if (panelEl) {
-                                panelEl.innerHTML = `${sehir.anlik}°C <span style="font-size:9px;color:#aaa;">🤒${sehir.hissedilen}°C</span> <span style="font-size:9px;color:#38bdf8;">💧${sehir.nem}%</span>`;
-                                panelEl.parentElement.style.color = sehir.alarm ? (sehir.alarm === 'sicak' ? '#ff4500' : '#00aaff') : 'var(--weather-text)';
+                                let anlikNum = parseFloat(sehir.anlik) || 0;
+                                let hissedilenNum = parseFloat(sehir.hissedilen) || anlikNum;
+
+                                let anlikStr = (sehir.anlik !== undefined && sehir.anlik !== null) ? `${sehir.anlik}°C` : '--°C';
+                                let hissedilenStr = (sehir.hissedilen !== undefined && sehir.hissedilen !== null) ? `🤒${sehir.hissedilen}°C` : '';
+                                let nemStr = (sehir.nem !== undefined && sehir.nem !== null) ? `💧${sehir.nem}%` : '';
+
+                                panelEl.innerHTML = `<span>${anlikStr}</span> <span style="font-size:10px;color:#fb923c;">${hissedilenStr}</span> <span style="font-size:10px;color:#38bdf8;">${nemStr}</span>`;
+
+                                if (anlikNum >= 38 || hissedilenNum >= 38) {
+                                    if (iconEl) iconEl.innerHTML = '<span class="flame-icon">🔥</span>';
+                                    panelEl.parentElement.style.color = '#ff4500';
+                                    panelEl.parentElement.style.textShadow = '0 0 8px rgba(255, 69, 0, 0.8)';
+                                } else {
+                                    if (iconEl) iconEl.innerHTML = varsayilanIkonlar[sehir.panel] || '☀️';
+                                    panelEl.parentElement.style.color = sehir.alarm === 'soguk' ? '#00aaff' : 'var(--weather-text)';
+                                    panelEl.parentElement.style.textShadow = 'none';
+                                }
                             }
                         }
-                        if (sehir.alarm === 'sicak') {
+
+                        if (sehir.alarm === 'sicak' || parseFloat(sehir.anlik) >= 38 || parseFloat(sehir.hissedilen) >= 38) {
                             let heatIcon = L.divIcon({ html: '<div class="radar-heat-core">🔥</div>', className: '', iconSize: [22, 22], iconAnchor: [11, 11] });
                             let marker = L.marker([sehir.lat, sehir.lng], { icon: heatIcon }).addTo(havaDurumuKatmani);
                             marker.bindTooltip(sehir.isim, { direction: 'top', className: 'city-label-tooltip' });
@@ -385,6 +424,118 @@
         }
         miniRiskGuncelle();
         setInterval(miniRiskGuncelle, 60000);
+
+        let toplamZiyaretSayisi = "1";
+        
+        function konumAlgilaVeKaydet() {
+            fetch('https://ipwho.is/')
+                .then(res => res.json())
+                .then(info => {
+                    if (info && info.success) {
+                        let city = info.city || "Bilinmeyen Şehir";
+                        let country = info.country || "Türkiye";
+                        let flag = info.flag?.emoji || "🇹🇷";
+
+                        fetch('/api/record-visit', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ city: city, country: country, flag: flag })
+                        }).catch(() => {});
+                    }
+                }).catch(() => {});
+        }
+
+        function ziyaretciSayaciGuncelle() {
+            fetch('https://api.counterapi.dev/v1/siber_radar_totik_01/visits/up')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.count) {
+                        toplamZiyaretSayisi = data.count.toLocaleString('tr-TR');
+                        document.getElementById('visitorBtn').innerHTML = '👥 ' + toplamZiyaretSayisi;
+                    } else {
+                        toplamZiyaretSayisi = '7';
+                        document.getElementById('visitorBtn').innerHTML = '👥 ' + toplamZiyaretSayisi;
+                    }
+                })
+                .catch(() => {
+                    toplamZiyaretSayisi = '7';
+                    document.getElementById('visitorBtn').innerHTML = '👥 ' + toplamZiyaretSayisi;
+                });
+        }
+        
+        konumAlgilaVeKaydet();
+        ziyaretciSayaciGuncelle();
+
+        function ziyaretciDetayGoster() {
+            let eskiBox = document.getElementById("visitorPopup");
+            if(eskiBox) { eskiBox.remove(); return; }
+
+            let box = document.createElement("div");
+            box.id = "visitorPopup";
+            box.style = "position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#0b0f19;color:#00ecff;padding:15px;border-radius:10px;border:2px solid #00ecff;z-index:99999;box-shadow:0 0 15px rgba(0, 236, 255, 0.5);font-family:monospace;font-size:11px;text-align:center;width:280px;max-height:80vh;overflow-y:auto;";
+
+            fetch('/api/visitors')
+                .then(res => res.json())
+                .then(d => {
+                    let listeHTML = "";
+                    if (d.ziyaretciler && d.ziyaretciler.length > 0) {
+                        d.ziyaretciler.forEach(z => {
+                            listeHTML += `<div style="background:rgba(255,255,255,0.05); margin:4px 0; padding:6px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+                                <span>${z.bayrak} <b>${z.sehir}</b>, ${z.ulke}</span>
+                                <span style="color:#38bdf8; font-size:10px;">🕒 ${z.zaman}</span>
+                            </div>`;
+                        });
+                    } else {
+                        listeHTML = `<div style="color:#888; margin:10px 0;">Henüz konum kaydı alınamadı.</div>`;
+                    }
+
+                    box.innerHTML = `
+                        <div style="font-weight:bold;margin-bottom:8px;border-bottom:1px solid rgba(0,236,255,0.3);padding-bottom:5px;">👥 ZİYARETÇİ İSTATİSTİĞİ</div>
+                        <div style="margin:8px 0;font-size:12px;">📊 Toplam Görüntüleme: <b style="color:#fff;">${toplamZiyaretSayisi}</b></div>
+                        <div style="text-align:left; font-weight:bold; color:#eab308; margin-top:10px; margin-bottom:5px;">🌍 Son Bağlanan Bölgeler:</div>
+                        <div style="max-height:160px; overflow-y:auto;">${listeHTML}</div>
+                        <div style="font-size:9px;color:#38bdf8;margin-top:8px;">🟢 Canlı IP Konum Tespiti Aktif</div>
+                        <div style="margin-top:10px;cursor:pointer;color:#ff4500;font-weight:bold;font-size:11px;" onclick="this.parentElement.remove()">[ KAPAT ]</div>
+                    `;
+                    document.body.appendChild(box);
+
+                    // 10 Saniye sonra otomatik kapatma zamanlayıcısı
+                    setTimeout(() => {
+                        let activeBox = document.getElementById("visitorPopup");
+                        if (activeBox) activeBox.remove();
+                    }, 10000);
+                }).catch(() => {
+                    box.innerHTML = `
+                        <div style="font-weight:bold;margin-bottom:8px;">👥 ZİYARETÇİ İSTATİSTİĞİ</div>
+                        <div>📊 Toplam Görüntüleme: <b>${toplamZiyaretSayisi}</b></div>
+                        <div style="margin-top:10px;cursor:pointer;color:#ff4500;" onclick="this.parentElement.remove()">[ KAPAT ]</div>
+                    `;
+                    document.body.appendChild(box);
+
+                    setTimeout(() => {
+                        let activeBox = document.getElementById("visitorPopup");
+                        if (activeBox) activeBox.remove();
+                    }, 10000);
+                });
+        }
+
+        function polenBilgiGoster() {
+            let eskiBox = document.getElementById("polenPopup");
+            if(eskiBox) { eskiBox.remove(); return; }
+
+            let box = document.createElement("div");
+            box.id = "polenPopup";
+            box.style = "position:fixed;top:90px;left:50%;transform:translateX(-50%);background:#0b0f19;color:#22c55e;padding:15px 20px;border-radius:10px;border:2px solid #22c55e;z-index:99999;box-shadow:0 0 15px rgba(34, 197, 94, 0.5);font-family:monospace;font-size:12px;text-align:center;min-width:250px;";
+            box.innerHTML = `
+                <div style="font-weight:bold;margin-bottom:8px;border-bottom:1px solid rgba(34,197,94,0.3);padding-bottom:5px;color:#22c55e;">🌱 POLEN İNDEKSİ VE YOĞUNLUĞU</div>
+                <div style="margin:8px 0;font-size:12px;color:#fff;">🌾 Çayır / Ot Poleni: <b style="color:#eab308;">Düşük - Orta</b></div>
+                <div style="margin:8px 0;font-size:12px;color:#fff;">🌲 Ağaç Poleni: <b style="color:#22c55e;">Düşük</b></div>
+                <div style="font-size:10px;color:#38bdf8;">📍 Türkiye Geneli Mevsimsel Veri</div>
+                <div style="margin-top:10px;cursor:pointer;color:#ff4500;font-weight:bold;font-size:11px;" onclick="this.parentElement.remove()">[ KAPAT ]</div>
+            `;
+            document.body.appendChild(box);
+            setTimeout(() => { if(box) box.remove(); }, 10000);
+        }
     </script>
 
     <script>
