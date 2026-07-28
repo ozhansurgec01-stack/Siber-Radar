@@ -367,94 +367,28 @@
             document.getElementById('cam-frame').src = '';
         }
 
+        
         function havaDurumuArayuzunuGuncelle() {
             fetch('/api/weather')
                 .then(res => res.json())
                 .then(data => {
-                    havaDurumuKatmani.clearLayers();
+                    if (typeof havaDurumuKatmani !== 'undefined' && havaDurumuKatmani.clearLayers) {
+                        havaDurumuKatmani.clearLayers();
+                    }
                     data.forEach(sehir => {
-                        if (sehir.panel) {
-                            let panelEl = document.getElementById(sehir.panel);
-                            if (panelEl) {
-                                panelEl.innerHTML = `${sehir.anlik}°C <span style="font-size:9px;color:#aaa;">🤒${sehir.hissedilen}°C</span> <span style="font-size:9px;color:#38bdf8;">💧${sehir.nem}%</span>`;
-                                panelEl.parentElement.style.color = sehir.alarm ? (sehir.alarm === 'sicak' ? '#ff4500' : '#00aaff') : 'var(--weather-text)';
-                            }
-                        }
-                        if (sehir.alarm === 'sicak') {
-                            let heatIcon = L.divIcon({ html: '<div class="radar-heat-core">🔥</div>', className: '', iconSize: [22, 22], iconAnchor: [11, 11] });
-                            let marker = L.marker([sehir.lat, sehir.lng], { icon: heatIcon }).addTo(havaDurumuKatmani);
-                            marker.bindTooltip(sehir.isim, { direction: 'top', className: 'city-label-tooltip' });
-                            marker.bindPopup(`<div style="font-family:monospace; text-align:center;"><b style="color:#ff4500;">🚨 KRİTİK SICAKLIK ALARMI!</b><br>📍 ${sehir.isim}<br>Sıcaklık: ${sehir.anlik}°C | Hissedilen: ${sehir.hissedilen}°C</div>`);
-                        } else if (sehir.alarm === 'soguk') {
-                            let coldIcon = L.divIcon({ html: '<div class="radar-cold-core">❄️</div>', className: '', iconSize: [22, 22], iconAnchor: [11, 11] });
-                            let marker = L.marker([sehir.lat, sehir.lng], { icon: coldIcon }).addTo(havaDurumuKatmani);
-                            marker.bindTooltip(sehir.isim, { direction: 'top', className: 'city-label-tooltip' });
-                            marker.bindPopup(`<div style="font-family:monospace; text-align:center;"><b style="color:#00aaff;">❄️ AŞIRI SOĞUK / DON ALARMI!</b><br>📍 ${sehir.isim}<br>Sıcaklık: ${sehir.anlik}°C | Hissedilen: ${sehir.hissedilen}°C</div>`);
+                        // Hem ID ile hem de panel seçici ile bulmayı denetleyelim
+                        let panelEl = document.getElementById(sehir.panel) || document.querySelector(`[data-panel="${sehir.panel}"]`);
+                        if (panelEl) {
+                            let t = sehir.sicaklik !== undefined ? sehir.sicaklik : (sehir.anlik !== undefined ? sehir.anlik : '--');
+                            panelEl.innerHTML = `${sehir.isim}<br>${t}°C`;
                         }
                     });
-                }).catch(() => {});
+                }).catch(err => console.log('Hava durumu hata:', err));
         }
         havaDurumuArayuzunuGuncelle();
-        setInterval(havaDurumuArayuzunuGuncelle, 60000);
+        setInterval(havaDurumuArayuzunuGuncelle, 30000);
 
-        var depremKatmani = L.layerGroup().addTo(map);
-        function depremleriYenile() {
-            fetch('/api')
-                .then(res => res.json())
-                .then(data => {
-                    let listDiv = document.getElementById('list');
-                    if (!data || data.length === 0) return;
-                    listDiv.innerHTML = '';
-                    depremKatmani.clearLayers();
-                    let count = 0;
-                    data.forEach(d => {
-                        if (d.mag >= 3.0) {
-                            count++;
-                            let renk = d.mag >= 4.0 ? '#f85149' : '#fb923c';
-                            L.circleMarker([d.lat, d.lng], { radius: Math.max(d.mag * 1.8, 3), color: '#fff', fillColor: renk, fillOpacity: 0.85, weight: 1.2 }).addTo(depremKatmani);
-                            listDiv.innerHTML += `<div class="eq-item">🕒 <span class="time-text">${d.zaman}</span> 📍 <b style="color:var(--text-eq-title);">${d.yer}</b><br>💥 Şiddet: <span class="mag-badge" style="background-color:${renk};">${d.mag}</span></div>`;
-                        }
-                    });
-                    if (count === 0) listDiv.innerHTML = `<div style="text-align: center; padding: 20px; font-family:monospace;">Son 3.0+ deprem yok. Radar temiz.</div>`;
-                }).catch(() => {});
-        }
-        depremleriYenile();
-        setInterval(depremleriYenile, 60000);
-
-        let pollenTimer = null;
-        function polenAlarmGoster() {
-            let b = document.getElementById("pollen-banner");
-            let btn = document.getElementById("pollenBtn");
-            if (b.style.display === "none" || b.style.display === "") {
-                b.style.display = "block";
-                btn.classList.add("active-mgm");
-                if (pollenTimer) clearTimeout(pollenTimer);
-                pollenTimer = setTimeout(() => {
-                    b.style.display = "none";
-                    btn.classList.remove("active-mgm");
-                }, 10000);
-            } else {
-                b.style.display = "none";
-                btn.classList.remove("active-mgm");
-                if (pollenTimer) clearTimeout(pollenTimer);
-            }
-        }
-
-        function riskGoster() {
-            let r = document.getElementById("miniRisk");
-            r.style.display = (r.style.display === "none" || r.style.display === "") ? "flex" : "none";
-            if(r.style.display === "flex") miniRiskGuncelle();
-        }
-        function miniRiskGuncelle() {
-            fetch('/api/risk').then(r => r.json()).then(d => {
-                document.getElementById("riskLow").innerHTML = d.dusuk + "%";
-                document.getElementById("riskMid").innerHTML = d.orta + "%";
-                document.getElementById("riskHigh").innerHTML = d.yuksek + "%";
-            }).catch(() => {});
-        }
-        miniRiskGuncelle();
-        setInterval(miniRiskGuncelle, 60000);
-    </script>
+</script>
     <script>
         async function canliYagisKontrol(){
             let btn=document.getElementById("liveRainBtn");
