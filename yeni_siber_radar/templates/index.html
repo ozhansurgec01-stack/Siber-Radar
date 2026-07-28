@@ -47,7 +47,7 @@
             justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
         }
         .brand-title { font-weight: bold; font-family: monospace; font-size: 13px; letter-spacing: 1px; text-shadow: var(--neon-glow); }
-        .nav-buttons { display: flex; gap: 3px; flex-wrap: wrap; max-width: 58vw; justify-content: flex-end; }
+        .nav-buttons { display: flex; gap: 3px; flex-wrap: wrap; max-width: 100vw; overflow: visible; justify-content: flex-end; }
         .nav-buttons::-webkit-scrollbar { display: none; }
         .toggle-btn { background: transparent; color: var(--text-color); border: var(--border-style); padding: 4px 6px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 9px; font-family: monospace; box-shadow: var(--neon-glow); white-space: nowrap; flex-shrink: 0; }
         .toggle-btn.active-risik { background: #ff4500; color: #fff; border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
@@ -59,7 +59,7 @@
         #mgm-banner, #cam-list-banner {
             position: absolute; top: 10px; left: 10px; right: 10px; z-index: 999;
             background: rgba(11, 15, 25, 0.95); border: 2px solid #eab308;
-            border-radius: 6px; padding: 8px 12px; display: none; font-family: monospace; color: #fff;
+            border-radius: 6px; padding: 8px 12px; display: none; font-family: monospace; color: #fff; font-size:13px;
         }
         #cam-list-banner { border: 2px solid var(--neon-color); }
         .mgm-title, .cam-list-title {
@@ -111,6 +111,15 @@
         }
         .city-label-tooltip { background: #0b0f19 !important; border: 1px solid #00ecff !important; color: #ffffff !important; font-family: monospace !important; font-size: 10px !important; padding: 3px 6px !important; border-radius: 4px !important; }
     </style>
+
+<style>
+#pollenBtn {
+    display: inline-block !important;
+    visibility: visible !important;
+    color: #00ff99 !important;
+    border-color: #00ff99 !important;
+}
+</style>
 </head>
 <body>
 
@@ -137,7 +146,7 @@
             <div id="mgmAlertArea"></div>
             <div class="mgm-list" id="mgmForecastContent"><div style="text-align:center; padding:10px;">Veriler yükleniyor...</div></div>
         </div>
-        <div id="pollen-banner" style="position: absolute; top: 10px; left: 10px; right: 10px; z-index: 999; background: rgba(11, 15, 25, 0.95); border: 2px solid #4ade80; border-radius: 6px; padding: 8px 12px; display: none; font-family: monospace; color: #fff;">
+        <div id="pollen-banner" style="position: absolute; top: 10px; left: 10px; right: 10px; z-index: 999; background: rgba(11, 15, 25, 0.95); border: 2px solid #4ade80; border-radius: 6px; padding: 8px 12px; display: none; font-family: monospace; color: #fff; font-size:13px;">
             <div style="font-weight: bold; font-size: 11px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; margin-bottom: 6px; color: #4ade80;">
                 <span>🌱 AKDENİZ BÖLGESİ POLEN & ALERJİ RAPORU</span>
                 <span style="cursor:pointer; color:#ff4500;" onclick="polenAlarmGoster()">[X]</span>
@@ -385,25 +394,47 @@
         setInterval(depremleriYenile, 60000);
 
         let pollenTimer = null;
-        function polenAlarmGoster() {
-            let b = document.getElementById("pollen-banner");
-            let btn = document.getElementById("pollenBtn");
-            if (b.style.display === "none" || b.style.display === "") {
-                b.style.display = "block";
-                btn.classList.add("active-mgm");
-                if (pollenTimer) clearTimeout(pollenTimer);
-                pollenTimer = setTimeout(() => {
-                    b.style.display = "none";
-                    btn.classList.remove("active-mgm");
-                }, 10000);
-            } else {
-                b.style.display = "none";
-                btn.classList.remove("active-mgm");
-                if (pollenTimer) clearTimeout(pollenTimer);
-            }
-        }
+        async function polenAlarmGoster() {
+    let b = document.getElementById("pollen-banner");
+    let btn = document.getElementById("pollenBtn");
 
-        function riskGoster() {
+    try {
+        let r = await fetch("/api/polen");
+        let d = await r.json();
+
+        b.innerHTML = "🌱 <b>POLEN DURUMU</b><br><br>" +
+        d.filter(x => ["İSTANBUL","ANKARA","İZMİR","ADANA","MERSİN","ANTALYA"].includes(x.isim))
+        .map(x =>
+        x.isim + "<br>" +
+        (x.agac == null ?
+        "📡 Gerçek polen verisi bekleniyor<br><br>" :
+        "🌿 Ağaç: " + x.agac + "  🌾 Çayır: " + x.cayir + "<br>" +
+        "🌼 Ot: " + x.ot + "  🤧 Risk: " + x.alerji + "<br><br>")
+        ).join("");;
+            d.filter(x => ["İSTANBUL","ANKARA","İZMİR","ADANA","MERSİN","ANTALYA","DİYARBAKIR"].includes(x.isim)).map(x => 
+                x.isim + ": " + x.seviye
+            ).join("<br>");
+
+    } catch(e) {
+        b.innerHTML = "🌱 Polen verisi alınamadı";
+    }
+
+    b.style.display = "block";
+
+    if(btn)
+        btn.classList.add("active-mgm");
+
+    if (pollenTimer)
+        clearTimeout(pollenTimer);
+
+    pollenTimer = setTimeout(() => {
+        b.style.display = "none";
+        if(btn)
+            btn.classList.remove("active-mgm");
+    },10000);
+}
+
+function riskGoster() {
             let r = document.getElementById("miniRisk");
             r.style.display = (r.style.display === "none" || r.style.display === "") ? "flex" : "none";
             if(r.style.display === "flex") miniRiskGuncelle();
@@ -422,7 +453,7 @@
     <script>
         async function canliYagisKontrol(){
             let btn=document.getElementById("liveRainBtn");   if(btn) btn.innerHTML="⏳ RADAR";
-            let box=document.createElement("div");            box.style="position:fixed;top:90px;left:50%;transform:translateX(-50%);background:white;color:#111;padding:18px;border-radius:15px;z-index:99999;box-shadow:0 5px 20px #0008;max-width:420px;white-space:nowrap;";
+            let box=document.createElement("div");            box.style="position:fixed;top:90px;left:50%;transform:translateX(-50%);background:white;color:#111;padding:18px;border-radius:15px;z-index:99999;box-shadow:0 5px 20px #0008;max-width:420px; max-height:70vh; overflow-y:auto; white-space:nowrap;";
             box.innerHTML="🌧️ <b>CANLI YAĞIŞ</b><br><br>🔎 Türkiye geneli radar kontrol ediliyor...";
             document.body.appendChild(box);
             try{

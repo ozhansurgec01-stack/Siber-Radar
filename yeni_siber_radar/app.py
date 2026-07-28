@@ -9,12 +9,16 @@ ziyaretciler = []
 
 # 4 Yabancı Kamera
 kameralar = [
-    ["Times Square Canlı Yayın (New York)", 40.7580, -73.9855, "https://www.youtube.com/embed/1-iS8LArMPA?autoplay=1&mute=1", "yt"],
-    ["Shibuya Crossing (Tokyo)", 35.6595, 139.7004, "https://www.youtube.com/embed/36YnV9STBqc?autoplay=1&mute=1", "yt"],
-    ["Piccadilly Circus (Londra)", 51.5100, -0.1347, "https://www.youtube.com/embed/gFRtAAmiFbE?autoplay=1&mute=1", "yt"],
-    ["Miami Beach (Florida)", 25.7617, -80.1918, "https://www.youtube.com/embed/Co4y1s0J3t0?autoplay=1&mute=1", "yt"]
+    ["Canlı Yayın Kamerası 7", 37.0000, 35.0000, "https://www.youtube.com/embed/gFRtAAmiFbE?autoplay=1", "yt"],
+    ["Canlı Yayın Kamerası 6", 37.0000, 35.0000, "https://www.youtube.com/embed/DEycz2Ufv98?autoplay=1", "yt"],
+    ["Canlı Yayın Kamerası 5", 40.7580, -73.9855, "https://www.youtube.com/embed/zfSst64NFcE?autoplay=1", "yt"],
+    ["Canlı Yayın Kamerası 4", 37.0000, 35.3213, "https://www.youtube.com/embed/16hHfZzf8-I?autoplay=1", "yt"],
+    ["Canlı Yayın Kamerası 3", 37.0000, 35.3213, "https://www.youtube.com/embed/EO_1LWqsCNE?autoplay=1", "yt"],
+    ["EarthCam Dublin Canlı Yayın", 53.3498, -6.2603, "https://www.youtube.com/embed/3nyPER2kzqk?autoplay=1", "yt"],
+    ["Times Square Canlı Yayın 2", 40.7580, -73.9855, "https://www.youtube.com/embed/lM3khCaiDos?autoplay=1", "yt"],
+    ["YouTube Canlı Yayın Kamerası", 38.7225, 35.4820, "https://www.youtube.com/embed/whIxfJ1IPoU?autoplay=1", "yt"],
+    ["Times Square Canlı Yayın Kamerası", 40.7580, -73.9855, "https://www.youtube.com/embed/z-jYdOI", "yt"]
 ]
-
 # Google Hava Durumu verileriyle güncellenmiş şehir listesi
 SEHIRLER = [
     {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist", "anlik": 29, "hissedilen": 29, "nem": 37},
@@ -57,53 +61,41 @@ def get_depremler():
 @app.route('/api/weather')
 def get_weather():
     sonuclar = []
-    try:
-        lats = ",".join([str(s['lat']) for s in SEHIRLER])
-        lngs = ",".join([str(s['lng']) for s in SEHIRLER])
-        url = f"https://api.open-meteo.com/v1/forecast?latitude={lats}&longitude={lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature"
-        r = requests.get(url, headers=HEADERS, timeout=4)
-        if r.status_code == 200:
-            data = r.json()
-            data_list = data if isinstance(data, list) else [data]
-            for idx, s in enumerate(SEHIRLER):
-                cur = data_list[idx].get('current', {}) if idx < len(data_list) else {}
-                anlik = round(cur.get('temperature_2m', s['anlik']))
-                hissedilen = round(cur.get('apparent_temperature', s['hissedilen']))
-                nem = round(cur.get('relative_humidity_2m', s['nem']))
-                
-                alarm = None
-                if anlik >= 38 or hissedilen >= 38:
-                    alarm = "sicak"
-                elif anlik <= 0 or hissedilen <= -2:
-                    alarm = "soguk"
-                    
-                sonuclar.append({
-                    "isim": s['isim'],
-                    "lat": s['lat'],
-                    "lng": s['lng'],
-                    "panel": s['panel'],
-                    "anlik": anlik,
-                    "hissedilen": hissedilen,
-                    "nem": nem,
-                    "alarm": alarm
-                })
-            return jsonify(sonuclar)
-    except Exception:
-        pass
 
-    # İstek basarisiz olursa Google'dan alinan gercek yedek veriler devreye girer
     for s in SEHIRLER:
-        alarm = "sicak" if s['anlik'] >= 38 or s['hissedilen'] >= 38 else None
+        try:
+            url = (
+                f"https://api.open-meteo.com/v1/forecast?"
+                f"latitude={s['lat']}&longitude={s['lng']}"
+                "&current=temperature_2m,relative_humidity_2m,apparent_temperature"
+            )
+
+            r = requests.get(url, timeout=5)
+            cur = r.json().get("current", {})
+
+            anlik = round(cur.get("temperature_2m", s["anlik"]))
+            hissedilen = round(cur.get("apparent_temperature", s["hissedilen"]))
+            nem = round(cur.get("relative_humidity_2m", s["nem"]))
+
+        except Exception as e:
+            print("HATA:", s["isim"], e)
+            anlik = s["anlik"]
+            hissedilen = s["hissedilen"]
+            nem = s["nem"]
+
+        alarm = "sicak" if anlik >= 38 or hissedilen >= 38 else None
+
         sonuclar.append({
-            "isim": s['isim'],
-            "lat": s['lat'],
-            "lng": s['lng'],
-            "panel": s['panel'],
-            "anlik": s['anlik'],
-            "hissedilen": s['hissedilen'],
-            "nem": s['nem'],
+            "isim": s["isim"],
+            "lat": s["lat"],
+            "lng": s["lng"],
+            "panel": s["panel"],
+            "anlik": anlik,
+            "hissedilen": hissedilen,
+            "nem": nem,
             "alarm": alarm
         })
+
     return jsonify(sonuclar)
 
 @app.route('/api/forecast5')
@@ -184,6 +176,42 @@ def get_visitors():
 def rain_check():
     return jsonify({"yerler": []})
 
+@app.route('/api/polen')
+def get_polen():
+    sonuc = []
+
+    polen_veri = {
+        "İSTANBUL": ("düşük", "green"),
+        "ANKARA": ("düşük", "green"),
+        "İZMİR": ("orta", "orange"),
+        "ADANA": ("orta", "orange"),
+        "MERSİN": ("yüksek", "red"),
+        "ANTALYA": ("orta", "orange"),
+        "DİYARBAKIR": ("düşük", "green"),
+        "TRABZON": ("yüksek", "red"),
+        "ERZURUM": ("orta", "orange")
+    }
+
+    for s in SEHIRLER:
+        seviye, renk = polen_veri.get(s["isim"], ("veri_yok", "gray"))
+        sonuc.append({
+            "isim": s["isim"],
+            "lat": s["lat"],
+            "lng": s["lng"],
+            "seviye": seviye,
+            "agac": seviye,
+            "cayir": seviye,
+            "ot": seviye,
+            "alerji": seviye,
+            "renk": renk
+        })
+
+    return jsonify(sonuc)
+
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
+
