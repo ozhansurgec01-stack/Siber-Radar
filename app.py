@@ -7,7 +7,7 @@ if os.path.exists("kameralar.json"):
     with open("kameralar.json", "r", encoding="utf-8") as f:
         kameralar = json.load(f)
 else:
-    kameralar = []
+    
 
 import os
 import requests
