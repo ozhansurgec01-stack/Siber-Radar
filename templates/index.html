@@ -384,7 +384,7 @@ function havaDurumuArayuzunuGuncelle() {
                     if (panelEl) {
                         let t = sehir.sicaklik !== undefined ? sehir.sicaklik : (sehir.anlik !== undefined ? sehir.anlik : '--');
                         let nem = sehir.nem !== undefined ? sehir.nem : '--';
-                        panelEl.innerHTML = `${sehir.isim}<br>${t}°C (Nem: %${nem})`;
+                        panelEl.innerHTML = `${sehir.isim} &nbsp;<b>${t}°C</b> &nbsp;|&nbsp; 💧 %${nem}`;
                     }
                 });
             }
