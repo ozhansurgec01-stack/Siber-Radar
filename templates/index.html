@@ -441,5 +441,47 @@
             if(btn) btn.innerHTML="🌧️ CANLI YAĞIŞ";
         }
     </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetch("https://ipapi.co/json/")
+    .then(res => res.json())
+    .then(data => {
+        return fetch("/api/record-visit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                city: data.city || "Bilinmiyor",
+                country: data.country_name || "Türkiye",
+                flag: "🇹🇷"
+            })
+        });
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.ziyaretciler) {
+            document.getElementById("ziyaretciSayisiBadge").innerText = data.ziyaretciler.length;
+        }
+    })
+    .catch(err => console.log("Ziyaretçi kaydedilemedi"));
+});
+
+function ziyaretcileriGoster() {
+    fetch("/api/get-visits")
+    .then(res => res.json())
+    .then(list => {
+        let metin = "Son Ziyaretçiler:\n\n";
+        if(list.length === 0) {
+            metin += "Henüz kayıtlı ziyaretçi yok.";
+        } else {
+            list.forEach((v, index) => {
+                metin += `${index + 1}. ${v.sehir} / ${v.ulke} - ${v.zaman}\n`;
+            });
+        }
+        alert(metin);
+    });
+}
+</script>
+    
 </body>
 </html>
