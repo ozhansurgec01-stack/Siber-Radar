@@ -208,210 +208,190 @@
         <span style="color:#ef4444;text-align:center">🔴 <span id="riskHigh">0%</span><br><small>Yüksek Risk</small></span>
     </div>
 
-    <script>
-        function setAppHeight() {
-            document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
-        }
-        window.addEventListener('resize', setAppHeight);
-        setAppHeight();
+    
+<script>
+function setAppHeight() {
+    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+}
+window.addEventListener('resize', setAppHeight);
+setAppHeight();
 
-        var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([38.9, 35.5], 6);
-        var siberKatman = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18, subdomains: 'abcd' });
-        var klasikKatman = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 });
+var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([38.9, 35.5], 6);
+var siberKatman = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18, subdomains: 'abcd' });
+var klasikKatman = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 });
+siberKatman.addTo(map);
+
+var tempLayer = L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=43ea6ba77a33cd1e0b37266634f1e949', {
+    maxZoom: 19,
+    opacity: 0.65,
+    zIndex: 105
+});
+let tempAktif = false;
+function toggleTempLayer() {
+    let btn = document.getElementById('btn-temp');
+    let layer = document.getElementById('thermalLayer');
+    if (tempAktif) {
+        layer.classList.remove('active');
+        btn.classList.remove('active-temp');
+        btn.innerText = '🌡️ SICAKLIK';
+        tempAktif = false;
+    } else {
+        layer.classList.add('active');
+        btn.classList.add('active-temp');
+        btn.innerText = '🌡️ SICAKLIK (AÇIK)';
+        tempAktif = true;
+    }
+}
+
+function toggleMod() {
+    var body = document.body;
+    var btn = document.getElementById('modeBtn');
+    if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        btn.innerText = "KLASİK";
+        map.removeLayer(klasikKatman);
         siberKatman.addTo(map);
+    } else {
+        body.classList.add('light-mode');
+        btn.innerText = "SİBER";
+        map.removeLayer(siberKatman);
+        klasikKatman.addTo(map);
+    }
+    setTimeout(() => map.invalidateSize({ pan: false }), 50);
+}
 
-        var tempLayer = L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=43ea6ba77a33cd1e0b37266634f1e949', {
-            maxZoom: 19,
-            opacity: 0.65,
-            zIndex: 105
-        });
-        let tempAktif = false;
+let aktifPanel = null;
+function togglePanel(type) {
+    let mgmBanner = document.getElementById('mgm-banner');
+    let camBanner = document.getElementById('cam-list-banner');
+    let mgmBtn = document.getElementById('mgmBtn');
+    let camBtn = document.getElementById('camListBtn');
 
-        function toggleTempLayer() {
-            let btn = document.getElementById('btn-temp');
-            let layer = document.getElementById('thermalLayer');
-            if (tempAktif) {
-                layer.classList.remove('active');
-                btn.classList.remove('active-temp');
-                btn.innerText = '🌡️ SICAKLIK';
-                tempAktif = false;
-            } else {
-                layer.classList.add('active');
-                btn.classList.add('active-temp');
-                btn.innerText = '🌡️ SICAKLIK (AÇIK)';
-                tempAktif = true;
-            }
+    if (aktifPanel === type) {
+        mgmBanner.style.display = 'none';
+        camBanner.style.display = 'none';
+        mgmBtn.classList.remove('active-mgm');
+        camBtn.classList.remove('active-cam');
+        aktifPanel = null;
+    } else {
+        mgmBanner.style.display = type === 'mgm' ? 'block' : 'none';
+        camBanner.style.display = type === 'cam' ? 'block' : 'none';
+        mgmBtn.classList.toggle('active-mgm', type === 'mgm');
+        camBtn.classList.toggle('active-cam', type === 'cam');
+        aktifPanel = type;
+
+        if (type === 'mgm') depremRiskVerileriniGetir();
+        if (type === 'cam') kameraListesiniDoldur();
+    }
+}
+
+var kameralarVerisi = {{ kameralar | tojson }};
+function kameraListesiniDoldur() {
+    var container = document.getElementById('camDropdownContent');
+    if (container.children.length > 0) return;
+    container.innerHTML = '';
+    kameralarVerisi.forEach(function(k) {
+        var [isim, lat, lng, link, type] = k;
+        var ikon = type === 'radar' ? "📡" : (type === 'yt' ? "▶️" : "📷");
+        if (type === 'radar') {
+            container.innerHTML += `<div class="cam-dropdown-item" onclick="alert('Bu bir sismik istasyon verisidir, istasyon aktiftir.')"><span>${ikon} <b>${isim}</b></span><span style="color:#38bdf8;">[SİSMİK]</span></div>`;
+        } else {
+            container.innerHTML += `<div class="cam-dropdown-item" onclick="canlıYayınAc('${link}', '${isim}'); togglePanel('cam');"><span>${ikon} <b>${isim}</b></span><span style="color:var(--neon-color);">İzle ▶</span></div>`;
         }
+    });
+}
 
-        function toggleMod() {
-            var body = document.body;
-            var btn = document.getElementById('modeBtn');
-            if (body.classList.contains('light-mode')) {
-                body.classList.remove('light-mode');
-                btn.innerText = "KLASİK";
-                map.removeLayer(klasikKatman);
-                siberKatman.addTo(map);
-            } else {
-                body.classList.add('light-mode');
-                btn.innerText = "SİBER";
-                map.removeLayer(siberKatman);
-                klasikKatman.addTo(map);
-            }
-            setTimeout(() => map.invalidateSize({ pan: false }), 50);
-        }
-
-        let aktifPanel = null;
-        function togglePanel(type) {
-            let mgmBanner = document.getElementById('mgm-banner');
-            let camBanner = document.getElementById('cam-list-banner');
-            let mgmBtn = document.getElementById('mgmBtn');
-            let camBtn = document.getElementById('camListBtn');
-
-            if (aktifPanel === type) {
-                mgmBanner.style.display = 'none';
-                camBanner.style.display = 'none';
-                mgmBtn.classList.remove('active-mgm');
-                camBtn.classList.remove('active-cam');
-                aktifPanel = null;
-            } else {
-                mgmBanner.style.display = type === 'mgm' ? 'block' : 'none';
-                camBanner.style.display = type === 'cam' ? 'block' : 'none';
-                mgmBtn.classList.toggle('active-mgm', type === 'mgm');
-                camBtn.classList.toggle('active-cam', type === 'cam');
-                aktifPanel = type;
-
-                if (type === 'mgm') canliTahminGetir();
-                if (type === 'cam') kameraListesiniDoldur();
-            }
-        }
-
-        var kameralarVerisi = {{ kameralar | tojson }};
-        function kameraListesiniDoldur() {
-            var container = document.getElementById('camDropdownContent');
-            if (container.children.length > 0) return;
+// RİSK / DEPREM VERİLERİNİ ÇEKEN FONKSİYON
+function depremRiskVerileriniGetir() {
+    fetch('/api/risk')
+        .then(res => res.json())
+        .then(data => {
+            var container = document.getElementById('mgmForecastContent');
+            if(!container) return;
             container.innerHTML = '';
-            kameralarVerisi.forEach(function(k) {
-                var [isim, lat, lng, link, type] = k;
-                var ikon = type === 'radar' ? "📡" : (type === 'yt' ? "▶️" : "📷");
-                if (type === 'radar') {
-                    container.innerHTML += `<div class="cam-dropdown-item" onclick="alert('Bu bir sismik istasyon verisidir, istasyon aktiftir.')"><span>${ikon} <b>${isim}</b></span><span style="color:#38bdf8;">[SİSMİK]</span></div>`;
-                } else {
-                    container.innerHTML += `<div class="cam-dropdown-item" onclick="canlıYayınAc('${link}', '${isim}'); togglePanel('cam');"><span>${ikon} <b>${isim}</b></span><span style="color:var(--neon-color);">İzle ▶</span></div>`;
-                }
+            if (!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = '<div style="color:#ff4500; text-align:center; padding:10px;">Son deprem verisi bulunamadı.</div>';
+                return;
+            }
+            data.forEach(item => {
+                container.innerHTML += `<div style="margin-bottom: 6px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; border-left: 3px solid #eab308;">
+                    <div style="font-size: 11px; color: #eab308; font-weight: bold;">⏰ ${item.tarih || ''} - 📍 ${item.yer || ''}</div>
+                    <div style="font-size: 12px; color: #fff; margin-top: 2px;">💥 Büyüklük: <b>${item.buyukluk || item.siddet || '--'}</b></div>
+                </div>`;
             });
-        }
+        }).catch(() => {
+            let container = document.getElementById('mgmForecastContent');
+            if(container) container.innerHTML = '<div style="color:#ff4500; text-align:center; padding:10px;">Deprem verileri yüklenemedi.</div>';
+        });
+}
 
-        function canliTahminGetir() {
-            fetch('/api/forecast5')
-                .then(res => res.json())
-                .then(data => {
-                    var container = document.getElementById('mgmForecastContent');
-                    container.innerHTML = '';
-                    if (data.tahminler.length === 0) {
-                        container.innerHTML = '<div style="color:#ff4500;">Tahmin verisi alınamadı.</div>';
-                        return;
-                    }
-                    data.tahminler.forEach(item => {
-                        container.innerHTML += `<div class="mgm-day"><span>${item.ikon} <b>${item.tarih}:</b> ${item.durum}</span><span style="color:#38bdf8; font-weight:bold;">${item.min}°C / ${item.max}°C</span></div>`;
-                    });
-                }).catch(() => {
-                    document.getElementById('mgmForecastContent').innerHTML = '<div style="color:#ff4500;">Bağlantı hatası.</div>';
-                });
-        }
-
-        let aktifKatmanlar = { meteo: { tile: null, aktif: false }, yildirim: { tile: null, aktif: false } };
-        function toggleRadarLayer(tip) {
-            let btn = document.getElementById(tip === 'meteo' ? 'meteoBtn' : 'yildirimBtn');
-            let katmanBilgi = aktifKatmanlar[tip];
-
-            if (katmanBilgi.aktif) {
-                if (katmanBilgi.tile) map.removeLayer(katmanBilgi.tile);
-                btn.classList.remove(tip === 'meteo' ? 'active-risik' : 'active-lightning');
-                btn.innerText = tip === 'meteo' ? '☔ YAĞIŞ' : '⚡ YILDIRIM';
-                katmanBilgi.aktif = false;
-            } else {
-                btn.innerText = "YÜKLENİYOR...";
-                fetch('https://api.rainviewer.com/public/weather-maps.json')
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data?.radar?.past?.length > 0) {
-                            let path = data.radar.past[data.radar.past.length - 1].path;
-                            let zIndex = tip === 'meteo' ? 100 : 101;
-                            let colorCode = tip === 'meteo' ? '2/1_1.png' : '3/1_0.png';
-                            let url = `https://tilecache.rainviewer.com${path}/256/{z}/{x}/{y}/${colorCode}`;
-
-                            if (katmanBilgi.tile) map.removeLayer(katmanBilgi.tile);
-                            katmanBilgi.tile = L.tileLayer(url, { opacity: tip === 'meteo' ? 0.65 : 0.85, zIndex: zIndex });
-                            katmanBilgi.tile.addTo(map);
-
-                            btn.classList.add(tip === 'meteo' ? 'active-risik' : 'active-lightning');
-                            btn.innerText = (tip === 'meteo' ? '☔ YAĞIŞ' : '⚡ YILDIRIM') + ' (AÇIK)';
-                            katmanBilgi.aktif = true;
-                        }
-                    })
-                    .catch(() => {
-                        btn.innerText = "HATA";
-                        setTimeout(() => { btn.innerText = tip === 'meteo' ? '☔ YAĞIŞ' : '⚡ YILDIRIM'; }, 2000);
-                    });
-            }
-        }
-
-        var havaDurumuKatmani = L.layerGroup().addTo(map);
-        function canlıYayınAc(url, isim) {
-            document.getElementById('cam-title').innerText = "🎥 " + isim;
-            document.getElementById('cam-frame').src = url;
-            document.getElementById('cam-container').style.display = 'flex';
-        }
-        function kameraKapat() {
-            document.getElementById('cam-container').style.display = 'none';
-            document.getElementById('cam-frame').src = '';
-        }
-
-        
-        function havaDurumuArayuzunuGuncelle() {
-            fetch('/api/weather')
-                .then(res => res.json())
-                .then(data => {
-                    if (typeof havaDurumuKatmani !== 'undefined' && havaDurumuKatmani.clearLayers) {
-                        havaDurumuKatmani.clearLayers();
-                    }
-                    data.forEach(sehir => {
-                        // Hem ID ile hem de panel seçici ile bulmayı denetleyelim
-                        let panelEl = document.getElementById(sehir.panel) || document.querySelector(`[data-panel="${sehir.panel}"]`);
-                        if (panelEl) {
-                            let t = sehir.sicaklik !== undefined ? sehir.sicaklik : (sehir.anlik !== undefined ? sehir.anlik : '--');
-                            panelEl.innerHTML = `${sehir.isim}<br>${t}°C`;
-                        }
-                    });
-                }).catch(err => console.log('Hava durumu hata:', err));
-        }
-        havaDurumuArayuzunuGuncelle();
-        setInterval(havaDurumuArayuzunuGuncelle, 30000);
-
-</script>
-    <script>
-        async function canliYagisKontrol(){
-            let btn=document.getElementById("liveRainBtn");
-            if(btn) btn.innerHTML="⏳ RADAR";
-            let box=document.createElement("div");
-            box.style="position:fixed;top:90px;left:50%;transform:translateX(-50%);background:white;color:#111;padding:18px;border-radius:15px;z-index:99999;box-shadow:0 5px 20px #0008;max-width:420px;white-space:nowrap;";
-            box.innerHTML="🌧️ <b>CANLI YAĞIŞ</b><br><br>🔎 Türkiye geneli radar kontrol ediliyor...";
-            document.body.appendChild(box);
-            try{
-                let r=await fetch("/api/rain-check");
-                let d=await r.json();
-                if(d.yerler && d.yerler.length){
-                    let liste=d.yerler.map(x => " 📍 "+x.il+" - "+x.ilce+" <b>"+x.durum+"</b>").join("<br>");
-                    box.innerHTML="🌧️ <b>Yağış tespit edilen bölgeler:</b><br><br>"+ liste+"<br><br>🛰️ RainViewer";
-                }else{
-                    box.innerHTML="☀️ Aktif yağış tespit edilmedi.";
+let aktifKatmanlar = { meteo: { tile: null, aktif: false }, yildirim: { tile: null, aktif: false } };
+function toggleRadarLayer(tip) {
+    let btn = document.getElementById(tip === 'meteo' ? 'meteoBtn' : 'yildirimBtn');
+    let katmanBilgi = aktifKatmanlar[tip];
+    if (katmanBilgi.aktif) {
+        if (katmanBilgi.tile) map.removeLayer(katmanBilgi.tile);
+        btn.classList.remove(tip === 'meteo' ? 'active-risik' : 'active-lightning');
+        btn.innerText = tip === 'meteo' ? '☔ YAĞIŞ' : '⚡ YILDIRIM';
+        katmanBilgi.aktif = false;
+    } else {
+        btn.innerText = "YÜKLENİYOR...";
+        fetch('https://api.rainviewer.com/public/weather-maps.json')
+            .then(res => res.json())
+            .then(data => {
+                if (data?.radar?.past?.length > 0) {
+                    let path = data.radar.past[data.radar.past.length - 1].path;
+                    let zIndex = tip === 'meteo' ? 100 : 101;
+                    let colorCode = tip === 'meteo' ? '2/1_1.png' : '3/1_0.png';
+                    let url = `https://tilecache.rainviewer.com${path}/256/{z}/{x}/{y}/${colorCode}`;
+                    if (katmanBilgi.tile) map.removeLayer(katmanBilgi.tile);
+                    katmanBilgi.tile = L.tileLayer(url, { opacity: tip === 'meteo' ? 0.65 : 0.85, zIndex: zIndex });
+                    katmanBilgi.tile.addTo(map);
+                    btn.classList.add(tip === 'meteo' ? 'active-risik' : 'active-lightning');
+                    btn.innerText = (tip === 'meteo' ? '☔ YAĞIŞ' : '⚡ YILDIRIM') + ' (AÇIK)';
+                    katmanBilgi.aktif = true;
                 }
-            }catch(e){
-                box.innerHTML="⚠️ Radar kontrol hatası";
+            })
+            .catch(() => {
+                btn.innerText = "HATA";
+                setTimeout(() => { btn.innerText = tip === 'meteo' ? '☔ YAĞIŞ' : '⚡ YILDIRIM'; }, 2000);
+            });
+    }
+}
+
+var havaDurumuKatmani = L.layerGroup().addTo(map);
+function canlıYayınAc(url, isim) {
+    document.getElementById('cam-title').innerText = "🎥 " + isim;
+    document.getElementById('cam-frame').src = url;
+    document.getElementById('cam-container').style.display = 'flex';
+}
+function kameraKapat() {
+    document.getElementById('cam-container').style.display = 'none';
+    document.getElementById('cam-frame').src = '';
+}
+
+// SICAKLIK VE NEM BİLGİSİNİ PANELLERE BASAN FONKSİYON
+function havaDurumuArayuzunuGuncelle() {
+    fetch('/api/weather')
+        .then(res => res.json())
+        .then(data => {
+            if (typeof havaDurumuKatmani !== 'undefined' && havaDurumuKatmani.clearLayers) {
+                havaDurumuKatmani.clearLayers();
             }
-            setTimeout(()=>box.remove(),10000);
-            if(btn) btn.innerHTML="🌧️ CANLI";
-        }
-    </script>
+            if(Array.isArray(data)) {
+                data.forEach(sehir => {
+                    let panelEl = document.getElementById(sehir.panel) || document.querySelector(`[data-panel="${sehir.panel}"]`);
+                    if (panelEl) {
+                        let t = sehir.sicaklik !== undefined ? sehir.sicaklik : (sehir.anlik !== undefined ? sehir.anlik : '--');
+                        let nem = sehir.nem !== undefined ? sehir.nem : '--';
+                        panelEl.innerHTML = `${sehir.isim}<br>${t}°C (Nem: %${nem})`;
+                    }
+                });
+            }
+        }).catch(err => console.log('Hava durumu hata:', err));
+}
+
+havaDurumuArayuzunuGuncelle();
+setInterval(havaDurumuArayuzunuGuncelle, 30000);
+</script>
 </body>
-</html>
