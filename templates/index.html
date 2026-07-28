@@ -22,6 +22,66 @@ function canliYagisKontrol() {
     if(typeof toggleRadarLayer === 'function') toggleRadarLayer('meteo');
 }
 
+
+function riskGoster() {
+    let p = document.getElementById('risk-banner');
+    if(p) {
+        let acik = p.style.display === 'block';
+        p.style.display = acik ? 'none' : 'block';
+        if(!acik) depremRiskVerileriniGetir();
+    }
+}
+
+function polenAlarmGoster() {
+    let p = document.getElementById('pollen-banner');
+    if(p) p.style.display = p.style.display === 'block' ? 'none' : 'block';
+}
+
+function canliYagisKontrol() {
+    if(typeof toggleRadarLayer === 'function') toggleRadarLayer('meteo');
+}
+
+function depremRiskVerileriniGetir() {
+    fetch('/api/risk')
+        .then(res => res.json())
+        .then(data => {
+            var container = document.getElementById('riskContent');
+            if(!container) return;
+            container.innerHTML = '';
+            if (!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = '<div style="color:#eab308; text-align:center; padding:10px;">Son 3.0+ deprem yok. Radar temiz.</div>';
+                return;
+            }
+            data.forEach(item => {
+                container.innerHTML += `<div style="margin-bottom: 6px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; border-left: 3px solid #eab308;">
+                    <div style="font-size: 11px; color: #eab308; font-weight: bold;">⏰ ${item.tarih || ''} - 📍 ${item.yer || ''}</div>
+                    <div style="font-size: 12px; color: #fff; margin-top: 2px;">💥 Büyüklük: <b>${item.buyukluk || item.siddet || '--'}</b></div>
+                </div>`;
+            });
+        }).catch(() => {
+            let container = document.getElementById('riskContent');
+            if(container) container.innerHTML = '<div style="color:#ff4500; text-align:center; padding:10px;">Deprem verileri yüklenemedi.</div>';
+        });
+}
+
+function havaDurumuArayuzunuGuncelle() {
+    fetch('/api/weather')
+        .then(res => res.json())
+        .then(data => {
+            if(Array.isArray(data)) {
+                data.forEach(sehir => {
+                    let panelEl = document.getElementById(sehir.panel);
+                    if (panelEl) {
+                        let t = sehir.sicaklik !== undefined ? sehir.sicaklik : (sehir.anlik !== undefined ? sehir.anlik : '--');
+                        let nem = sehir.nem !== undefined ? sehir.nem : '--';
+                        // Çift şehir ismini önlemek için sadece derece ve nem yazıyoruz
+                        panelEl.innerHTML = `<br><span style="font-size:14px; font-weight:bold; color:#fff;">${t}°C</span> &nbsp;<span style="color:#38bdf8; font-size:13px;">💧 %${nem}</span>`;
+                    }
+                });
+            }
+        }).catch(err => console.log('Hava durumu hata:', err));
+}
+
 </script>
     <style>
         :root {
@@ -161,7 +221,16 @@ function canliYagisKontrol() {
     </div>
 
     <div class="map-container">
-        <div id="mgm-banner">
+        <div id="risk-banner" style="position: absolute; top: 10px; left: 10px; right: 10px; z-index: 999; background: rgba(11, 15, 25, 0.95); border: 2px solid #eab308; border-radius: 6px; padding: 8px 12px; display: none; font-family: monospace; color: #fff;">
+    <div style="font-weight: bold; font-size: 11px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; margin-bottom: 6px; color: #eab308;">
+        <span>💥 CANLI SON DEPREMLER & RİSK RAPORU</span>
+        <span style="cursor:pointer; color:#ff4500;" onclick="riskGoster()">[X]</span>
+    </div>
+    <div id="riskContent" style="font-size: 11px; max-height: 180px; overflow-y: auto;">
+        <div style="text-align:center; padding:10px;">Veriler yükleniyor...</div>
+    </div>
+</div>
+<div id="mgm-banner">
             <div class="mgm-title" style="color: #eab308;">
                 <span>📡 CANLI 5 GÜNLÜK HAVA TAHMİNİ (ADANA)</span>
                 <span style="cursor:pointer; color:#ff4500;" onclick="togglePanel('mgm')">[X]</span>
@@ -426,6 +495,66 @@ function canliYagisKontrol() {
     let canliBtn = document.getElementById('liveRainBtn');
     if(canliBtn) canliBtn.classList.toggle('active-risik');
     if(typeof toggleRadarLayer === 'function') toggleRadarLayer('meteo');
+}
+
+
+function riskGoster() {
+    let p = document.getElementById('risk-banner');
+    if(p) {
+        let acik = p.style.display === 'block';
+        p.style.display = acik ? 'none' : 'block';
+        if(!acik) depremRiskVerileriniGetir();
+    }
+}
+
+function polenAlarmGoster() {
+    let p = document.getElementById('pollen-banner');
+    if(p) p.style.display = p.style.display === 'block' ? 'none' : 'block';
+}
+
+function canliYagisKontrol() {
+    if(typeof toggleRadarLayer === 'function') toggleRadarLayer('meteo');
+}
+
+function depremRiskVerileriniGetir() {
+    fetch('/api/risk')
+        .then(res => res.json())
+        .then(data => {
+            var container = document.getElementById('riskContent');
+            if(!container) return;
+            container.innerHTML = '';
+            if (!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = '<div style="color:#eab308; text-align:center; padding:10px;">Son 3.0+ deprem yok. Radar temiz.</div>';
+                return;
+            }
+            data.forEach(item => {
+                container.innerHTML += `<div style="margin-bottom: 6px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; border-left: 3px solid #eab308;">
+                    <div style="font-size: 11px; color: #eab308; font-weight: bold;">⏰ ${item.tarih || ''} - 📍 ${item.yer || ''}</div>
+                    <div style="font-size: 12px; color: #fff; margin-top: 2px;">💥 Büyüklük: <b>${item.buyukluk || item.siddet || '--'}</b></div>
+                </div>`;
+            });
+        }).catch(() => {
+            let container = document.getElementById('riskContent');
+            if(container) container.innerHTML = '<div style="color:#ff4500; text-align:center; padding:10px;">Deprem verileri yüklenemedi.</div>';
+        });
+}
+
+function havaDurumuArayuzunuGuncelle() {
+    fetch('/api/weather')
+        .then(res => res.json())
+        .then(data => {
+            if(Array.isArray(data)) {
+                data.forEach(sehir => {
+                    let panelEl = document.getElementById(sehir.panel);
+                    if (panelEl) {
+                        let t = sehir.sicaklik !== undefined ? sehir.sicaklik : (sehir.anlik !== undefined ? sehir.anlik : '--');
+                        let nem = sehir.nem !== undefined ? sehir.nem : '--';
+                        // Çift şehir ismini önlemek için sadece derece ve nem yazıyoruz
+                        panelEl.innerHTML = `<br><span style="font-size:14px; font-weight:bold; color:#fff;">${t}°C</span> &nbsp;<span style="color:#38bdf8; font-size:13px;">💧 %${nem}</span>`;
+                    }
+                });
+            }
+        }).catch(err => console.log('Hava durumu hata:', err));
 }
 
 </script>
