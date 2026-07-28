@@ -44,15 +44,15 @@ def api():
 @app.route('/api/weather')
 def weather():
     sehirler = [
-        {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "istanbul"},
-        {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "ankara"},
-        {"isim": "İZMİR", "lat": 38.4192, "lng": 27.1287, "panel": "izmir"},
-        {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "adana"},
-        {"isim": "MERSİN", "lat": 36.8121, "lng": 34.6415, "panel": "mersin"},
-        {"isim": "ANTALYA", "lat": 36.8841, "lng": 30.7056, "panel": "antalya"},
-        {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "diyarbakir"},
-        {"isim": "TRABZON", "lat": 41.0015, "lng": 39.7178, "panel": "trabzon"},
-        {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2729, "panel": "erzurum"}
+        {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist"},
+        {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank"},
+        {"isim": "İZMİR", "lat": 38.4192, "lng": 27.1287, "panel": "w-izm"},
+        {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "w-adn"},
+        {"isim": "MERSİN", "lat": 36.8121, "lng": 34.6415, "panel": "w-mer"},
+        {"isim": "ANTALYA", "lat": 36.8841, "lng": 30.7056, "panel": "w-ant"},
+        {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "w-diy"},
+        {"isim": "TRABZON", "lat": 41.0015, "lng": 39.7178, "panel": "w-trb"},
+        {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2729, "panel": "w- erz"}
     ]
     sonuc = []
     for s in sehirler:
