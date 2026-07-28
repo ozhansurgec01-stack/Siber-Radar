@@ -476,6 +476,7 @@ let firtinaLayer = L.layerGroup().addTo(map);
 function firtinaGoster(){
 
     firtinaLayer.clearLayers();
+    map.setView([39,35],6);
 
     fetch('/api/storm')
     .then(r=>r.json())
@@ -498,8 +499,13 @@ function firtinaGoster(){
                 iconSize:[22,22]
             });
 
-            let marker=L.marker([x.lat,x.lng],{icon:icon})
-            .addTo(firtinaLayer);
+            let marker=L.circleMarker([x.lat,x.lng],{
+                radius:14,
+                color:"#ffffff",
+                weight:2,
+                fillColor:renk,
+                fillOpacity:0.9
+            }).addTo(firtinaLayer);
 
             marker.bindPopup(`
             <b>🌪️ FIRTINA DURUMU</b><br>
