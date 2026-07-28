@@ -268,20 +268,20 @@ function togglePanel(type) {
     let camBtn = document.getElementById('camListBtn');
 
     if (aktifPanel === type) {
-        mgmBanner.style.display = 'none';
-        camBanner.style.display = 'none';
-        mgmBtn.classList.remove('active-mgm');
-        camBtn.classList.remove('active-cam');
+        if (mgmBanner) mgmBanner.style.display = 'none';
+        if (camBanner) camBanner.style.display = 'none';
+        if (mgmBtn) mgmBtn.classList.remove('active-mgm');
+        if (camBtn) camBtn.classList.remove('active-cam');
         aktifPanel = null;
     } else {
-        mgmBanner.style.display = type === 'mgm' ? 'block' : 'none';
-        camBanner.style.display = type === 'cam' ? 'block' : 'none';
-        mgmBtn.classList.toggle('active-mgm', type === 'mgm');
-        camBtn.classList.toggle('active-cam', type === 'cam');
+        if (mgmBanner) mgmBanner.style.display = type === 'mgm' ? 'block' : 'none';
+        if (camBanner) camBanner.style.display = type === 'cam' ? 'block' : 'none';
+        if (mgmBtn) mgmBtn.classList.toggle('active-mgm', type === 'mgm');
+        if (camBtn) camBtn.classList.toggle('active-cam', type === 'cam');
         aktifPanel = type;
 
-        if (type === 'mgm') depremRiskVerileriniGetir();
-        if (type === 'cam') kameraListesiniDoldur();
+        if (type === 'mgm' && typeof depremRiskVerileriniGetir === 'function') depremRiskVerileriniGetir();
+        if (type === 'cam' && typeof kameraListesiniDoldur === 'function') kameraListesiniDoldur();
     }
 }
 
@@ -384,7 +384,8 @@ function havaDurumuArayuzunuGuncelle() {
                     if (panelEl) {
                         let t = sehir.sicaklik !== undefined ? sehir.sicaklik : (sehir.anlik !== undefined ? sehir.anlik : '--');
                         let nem = sehir.nem !== undefined ? sehir.nem : '--';
-                        panelEl.innerHTML = `${sehir.isim} &nbsp;<b>${t}°C</b> &nbsp;|&nbsp; 💧 %${nem}`;
+                        // Şehir ismi üstte, sıcaklık ve mavi damla nem bilgisi altta şık düzen
+                        panelEl.innerHTML = `<div style="font-weight:bold; font-size:13px; color:#38bdf8; letter-spacing:0.5px;">${sehir.isim}</div><div style="font-size:15px; font-weight:bold; color:#fff; margin-top:2px;">${t}°C &nbsp;<span style="color:#38bdf8; font-size:14px;">💧 %${nem}</span></div>`;
                     }
                 });
             }
