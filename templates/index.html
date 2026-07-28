@@ -125,6 +125,7 @@
             <button class="toggle-btn" id="mgmBtn" onclick="togglePanel('mgm')">📅 5 GÜN</button>
             <button class="toggle-btn" id="meteoBtn" onclick="toggleRadarLayer('meteo')">☔ YAĞIŞ</button>
             <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
+<button class="toggle-btn" id="tempBtn" onclick="toggleSicaklik()">🌡️ SICAKLIK</button>
 <button class="toggle-btn" onclick="polenGoster()">🌿 POLEN</button>
             <button class="toggle-btn" id="modeBtn" onclick="toggleMod()">KLASİK</button>
         </div>
@@ -443,5 +444,27 @@ t+="🤧 Risk: "+x.alerji+"\n\n";
 });
 alert(t);
 });
+}
+</script>
+
+<script>
+let sicaklikLayer = null;
+
+function toggleSicaklik(){
+    let btn=document.getElementById("tempBtn");
+
+    if(sicaklikLayer){
+        map.removeLayer(sicaklikLayer);
+        sicaklikLayer=null;
+        btn.innerHTML="🌡️ SICAKLIK";
+        return;
+    }
+
+    sicaklikLayer=L.tileLayer(
+        "https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=YOUR_API_KEY",
+        {opacity:0.65}
+    ).addTo(map);
+
+    btn.innerHTML="🌡️ SICAKLIK (AÇIK)";
 }
 </script>
