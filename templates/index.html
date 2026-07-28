@@ -416,3 +416,13 @@
     </script>
 </body>
 </html>
+
+
+<script>
+fetch('/api/polen')
+.then(r=>r.json())
+.then(data=>{
+    console.log("Polen verisi:", data);
+    window.polenVerisi=data;
+});
+</script>
