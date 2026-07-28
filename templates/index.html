@@ -113,6 +113,7 @@
         }
         .city-label-tooltip { background: #0b0f19 !important; border: 1px solid #00ecff !important; color: #ffffff !important; font-family: monospace !important; font-size: 10px !important; padding: 3px 6px !important; border-radius: 4px !important; }
     </style>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 </head>
 <body>
 
@@ -452,6 +453,7 @@ alert(t);
 let sicaklikLayer = null;
 
 function toggleSicaklik(){
+
     let btn=document.getElementById("tempBtn");
 
     if(sicaklikLayer){
@@ -461,60 +463,79 @@ function toggleSicaklik(){
         return;
     }
 
-    sicaklikLayer=L.tileLayer(
-        "https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=YOUR_API_KEY",
-        {opacity:0.65}
-    ).addTo(map);
+    fetch('/api/storm')
+    .then(r=>r.json())
+    .then(data=>{
 
-    btn.innerHTML="🌡️ SICAKLIK (AÇIK)";
+        let noktalar=data.map(x=>{
+
+            let yogunluk=Math.min(
+                Math.max((x.sicaklik-10)/25,0.4),
+                1
+            );
+
+            return [
+                x.lat,
+                x.lng,
+                yogunluk
+            ];
+
+        });
+
+        sicaklikLayer=L.heatLayer(noktalar,{
+            radius:120,
+            blur:60,
+            maxZoom:8,
+            gradient:{
+                0.2:"#0044ff",
+                0.4:"#00aaff",
+                0.6:"#ffff00",
+                0.8:"#ff8800",
+                1:"#ff0000"
+            }
+        }).addTo(map);
+
+        btn.innerHTML="🌡️ SICAKLIK (AÇIK)";
+
+    });
 }
 </script>
 
 <script>
-let firtinaLayer = L.layerGroup().addTo(map);
 
 function firtinaGoster(){
-
-    firtinaLayer.clearLayers();
 
     fetch('/api/storm')
     .then(r=>r.json())
     .then(data=>{
 
-        data.forEach(x=>{
+        let liste=data.filter(x =>
+            x.durum==="fırtına" ||
+            x.durum==="kuvvetli rüzgar"
+        );
 
-            let renk = x.renk || "green";
+        let icerik="<b>🌪️ FIRTINA UYARILARI</b><br><br>";
 
-            let icon = L.divIcon({
-                className:"",
-                html:`<div style="
-                background:${renk};
-                width:22px;
-                height:22px;
-                border-radius:50%;
-                border:2px solid white;
-                box-shadow:0 0 10px ${renk};
-                "></div>`,
-                iconSize:[22,22]
+        if(liste.length===0){
+            icerik+="🌤️ Şu an fırtına uyarısı bulunmuyor";
+        }else{
+            liste.forEach(x=>{
+                icerik+=`
+                📍 <b>${x.isim}</b><br>
+                💨 Rüzgar: ${x.ruzgar} km/s<br>
+                🌡️ Sıcaklık: ${x.sicaklik}°C<br>
+                ⚠️ Durum: ${x.durum}<br><br>`;
             });
+        }
 
-            let marker=L.circleMarker([x.lat,x.lng],{
-                radius:14,
-                color:"#ffffff",
-                weight:2,
-                fillColor:renk,
-                fillOpacity:0.9
-            }).addTo(firtinaLayer);
+        L.popup()
+        .setLatLng(map.getCenter())
+        .setContent(icerik)
+        .openOn(map);
 
-            marker.bindPopup(`
-            <b>🌪️ FIRTINA DURUMU</b><br>
-            📍 ${x.isim}<br>
-            💨 Rüzgar: ${x.ruzgar} km/s<br>
-            🌡️ Sıcaklık: ${x.sicaklik}°C<br>
-            ⚠️ Durum: ${x.durum}
-            `);
-
-        });
+        setTimeout(()=>{
+            map.closePopup();
+        },10000);
 
     });
 }

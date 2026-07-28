@@ -210,37 +210,86 @@ def get_polen():
 
 
 
+@app.route('/api/storm')
+def get_storm():
+    sehirler=[
+        {"isim":"İSTANBUL","lat":41.0082,"lng":28.9784},
+        {"isim":"ANKARA","lat":39.9334,"lng":32.8597},
+        {"isim":"İZMİR","lat":38.4237,"lng":27.1428},
+        {"isim":"TRABZON","lat":41.0027,"lng":39.7168},
+        {"isim":"ANTALYA","lat":36.8969,"lng":30.7133}
+    ]
+
+    sonuc=[]
+
+    for x in sehirler:
+        try:
+            url=f"https://api.open-meteo.com/v1/forecast?latitude={x['lat']}&longitude={x['lng']}&current=wind_speed_10m,temperature_2m"
+            r=requests.get(url,timeout=5).json()
+
+            ruzgar=r["current"]["wind_speed_10m"]
+
+            if ruzgar >= 70:
+                durum="fırtına"
+                renk="red"
+            elif ruzgar >= 40:
+                durum="kuvvetli rüzgar"
+                renk="orange"
+            else:
+                durum="normal"
+                renk="green"
+
+            sonuc.append({
+                "isim":x["isim"],
+                "ruzgar":ruzgar,
+                "sicaklik":r["current"]["temperature_2m"],
+                "durum":durum,
+                "renk":renk,
+                "lat":x["lat"],
+                "lng":x["lng"]
+            })
+
+        except:
+            pass
+
+    return jsonify(sonuc)
+
+
+
+@app.route('/api/temperature-map')
+def temperature_map():
+    try:
+        import requests
+
+        url="https://api.open-meteo.com/v1/forecast?latitude=39&longitude=35&hourly=temperature_2m&forecast_days=1"
+        # Türkiye grid verisi için örnek noktalar
+        noktalar=[]
+
+        for lat in range(36,43,1):
+            for lng in range(26,46,1):
+                try:
+                    u=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&hourly=temperature_2m&forecast_days=1"
+                    r=requests.get(u,timeout=5).json()
+                    sic=r["hourly"]["temperature_2m"][0]
+
+                    noktalar.append({
+                        "lat":lat,
+                        "lng":lng,
+                        "sicaklik":sic
+                    })
+                except:
+                    pass
+
+        return jsonify(noktalar)
+
+    except Exception as e:
+        return jsonify({"hata":str(e)})
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 
 
 
-@app.route('/api/storm')
-def get_storm():
-    return jsonify([
-        {
-            "isim":"İSTANBUL",
-            "lat":41.0082,
-            "lng":28.9784,
-            "durum":"normal",
-            "ruzgar":20,
-            "renk":"green"
-        },
-        {
-            "isim":"İZMİR",
-            "lat":38.4237,
-            "lng":27.1428,
-            "durum":"kuvvetli rüzgar",
-            "ruzgar":55,
-            "renk":"orange"
-        },
-        {
-            "isim":"TRABZON",
-            "lat":41.0027,
-            "lng":39.7168,
-            "durum":"fırtına",
-            "ruzgar":75,
-            "renk":"red"
-        }
-    ])
+
