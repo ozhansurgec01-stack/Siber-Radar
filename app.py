@@ -1,18 +1,18 @@
 from flask import Flask, render_template, jsonify
 import requests
-from datetime import datetime
 
 app = Flask(__name__)
 
-# Kameralar ve İstasyonlar listesi
+# Orijinal Kameraların ve İstasyonların Tam Listesi
 KAMERALAR = [
     ["Adana AFAD Merkezi", 37.0000, 35.3213, "https://www.youtube.com/embed/live_stream?channel=UC_example1", "yt"],
     ["Hatay Sismik İstasyonu", 36.2000, 36.1600, "", "radar"],
     ["Osmaniye Canlı Kamera", 37.0742, 36.2478, "https://www.youtube.com/embed/live_stream?channel=UC_example2", "yt"],
-    ["Mersin Sahil Gözlem", 36.8000, 34.6333, "https://www.youtube.com/embed/live_stream?channel=UC_example3", "yt"]
+    ["Mersin Sahil Gözlem", 36.8000, 34.6333, "https://www.youtube.com/embed/live_stream?channel=UC_example3", "yt"],
+    ["Kahramanmaraş Trafik", 37.5858, 36.9371, "https://www.youtube.com/embed/live_stream?channel=UC_example4", "yt"],
+    ["Gaziantep Canlı Gözlem", 37.0662, 37.3833, "https://www.youtube.com/embed/live_stream?channel=UC_example5", "yt"]
 ]
 
-# Deprem Verisi (Kandilli / AFAD Simülasyonu veya Canlı API)
 @app.route('/api')
 def api_depremler():
     try:
@@ -32,14 +32,11 @@ def api_depremler():
             return jsonify(depremler)
     except:
         pass
-    
-    # Yedek Statik Veri (Deprem API yanıt vermezse)
     return jsonify([
         {"lat": 37.12, "lng": 36.45, "mag": 3.4, "yer": "İslahiye (Gaziantep)", "zaman": "2026-07-28 06:10:00"},
         {"lat": 36.85, "lng": 35.75, "mag": 3.1, "yer": "Körfez - Adana Açıkları", "zaman": "2026-07-28 05:20:00"}
     ])
 
-# 5 Günlük Hava Tahmini (Adana Örneği)
 @app.route('/api/forecast5')
 def api_forecast():
     try:
@@ -48,7 +45,6 @@ def api_forecast():
         data = res.json()
         tahminler = []
         if "list" in data:
-            # Günlük tahminleri derle (her gün için bir örnek)
             islenen_gunler = set()
             for item in data["list"]:
                 tarih_str = item["dt_txt"]
@@ -70,7 +66,6 @@ def api_forecast():
     except:
         return jsonify({"tahminler": [{"tarih": "Bugün", "durum": "Parçalı Bulutlu", "min": 24, "max": 35, "ikon": "☀️"}]})
 
-# Şehirler Anlık Hava Durumu ve Sıcaklık/Soğukluk Alarmları
 @app.route('/api/weather')
 def api_weather():
     sehirler = [
@@ -94,7 +89,6 @@ def api_weather():
             feels = round(res["main"]["feels_like"])
             humidity = res["main"]["humidity"]
             
-            # Alarm mantığı: 34 derece üstü sıcak, 2 derece altı soğuk/don
             alarm = None
             if temp >= 33:
                 alarm = "sicak"

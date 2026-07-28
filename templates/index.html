@@ -211,7 +211,6 @@
         var klasikKatman = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 });
         siberKatman.addTo(map);
 
-        // Gerçek Zamanlı Sıcaklık Isı Katmanı (OpenWeatherMap)
         var tempLayer = L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=43ea6ba77a33cd1e0b37266634f1e949', {
             maxZoom: 19,
             opacity: 0.65,
