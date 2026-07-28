@@ -54,36 +54,20 @@ def weather():
         {"isim": "TRABZON", "lat": 41.0015, "lng": 39.7178, "panel": "trabzon"},
         {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2729, "panel": "erzurum"}
     ]
-
     sonuc = []
     for s in sehirler:
         try:
-            url = f"https://api.open-meteo.com/v1/forecast?latitude={s['lat']}&longitude={s['lng']}&current=temperature_2m,relative_humidity_2m,apparent_temperature"
+            url = f"https://api.open-meteo.com/v1/forecast?latitude={s["lat"]}&longitude={s["lng"]}&current=temperature_2m,relative_humidity_2m,apparent_temperature"
             res = requests.get(url, timeout=3)
-            data = res.json().get('current', {})
-            temp = round(data.get('temperature_2m', 25))
-            app_temp = round(data.get('apparent_temperature', temp + 2))
-            hum = round(data.get('relative_humidity_2m', 50))
+            data = res.json().get("current", {})
+            temp = round(data.get("temperature_2m", 25))
+            app_temp = round(data.get("apparent_temperature", temp + 2))
+            hum = round(data.get("relative_humidity_2m", 50))
         except Exception as e:
             temp, app_temp, hum = 25, 27, 50
-
-        alarm = 'sicak' if temp >= 38.0 else ('soguk' if temp <= 0 else 'normal')
-
-        sonuc.append({
-            "isim": s["isim"],
-            "lat": s["lat"],
-            "lng": s["lng"],
-            "panel": s["panel"],
-            "sicaklik": temp,
-            "anlik": temp,
-            "hissedilen": app_temp,
-            "nem": hum,
-            "alarm": alarm
-        })
-
+        alarm = "sicak" if temp >= 38.0 else ("soguk" if temp <= 0 else "normal")
+        sonuc.append({"isim": s["isim"], "lat": s["lat"], "lng": s["lng"], "panel": s["panel"], "sicaklik": temp, "anlik": temp, "hissedilen": app_temp, "nem": hum, "alarm": alarm})
     return jsonify(sonuc)
-
-
 @app.route('/api/forecast5')
 def forecast5():
     tahminler = [
