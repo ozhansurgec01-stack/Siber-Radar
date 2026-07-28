@@ -114,11 +114,19 @@
         .city-label-tooltip { background: #0b0f19 !important; border: 1px solid #00ecff !important; color: #ffffff !important; font-family: monospace !important; font-size: 10px !important; padding: 3px 6px !important; border-radius: 4px !important; }
     </style>
 <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<style>
+.leaflet-popup-content{
+ max-width:350px !important;
+ max-height:400px;
+ overflow-y:auto;
+ font-size:12px; line-height:1.25;
+}
+</style>
 </head>
 <body>
 
     <div class="top-nav">
-        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;">📡 SİBER RADAR</div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:13px; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
+        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;">📡 SİBER RADAR</div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:12px; line-height:1.25; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
         <div class="nav-buttons">
             <button class="toggle-btn" id="camListBtn" onclick="togglePanel('cam')">🎥 KAMERALAR</button>
             <button class="toggle-btn" id="riskBtn" onclick="riskGoster()">📊 RİSK</button>
@@ -469,7 +477,19 @@ function firtinaGoster(){
             x.durum==="kuvvetli rüzgar"
         );
 
-        let icerik="<b>🌪️ FIRTINA UYARILARI</b><br><br>";
+        let icerik=`
+<b>🌪️ METEOROLOJİK UYARI</b><br><br>
+📍 Akdeniz İç Kesimleri<br>
+⚠️ Kuvvetli Rüzgar / Fırtına<br><br>
+💨 40-70 km/s<br>
+🔴 Yer yer 80 km/s<br><br>
+📅 29.07.2026<br><br>
+<b>Etkilenen bölgeler:</b><br>
+• Mersin iç ve yüksek kesimleri<br>
+• Adana kuzey ilçeleri<br>
+• Kahramanmaraş iç kesimleri<br><br>
+<hr>
+<b>🌪️ FIRTINA NOKTALARI</b><br><br>`;
 
         if(liste.length===0){
             icerik+="🌤️ Şu an fırtına uyarısı bulunmuyor";
@@ -483,8 +503,11 @@ function firtinaGoster(){
             });
         }
 
-    L.popup()
-    .setLatLng(map.getCenter())
+    L.popup({
+        autoPan:false,
+        closeOnClick:true
+    })
+    .setLatLng(map.containerPointToLatLng([map.getSize().x/2, map.getSize().y/2 + 180]))
     .setContent(icerik)
     .openOn(map);
 
