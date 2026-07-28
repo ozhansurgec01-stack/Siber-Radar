@@ -60,10 +60,11 @@ def weather():
         app_temp = s["hissedilen"]
         hum = s["nem"]
         
+        # Haritadaki sıcaklık/soğukluk katmanı için alarm parametresi
         alarm = None
-        if temp >= 35.0:
+        if temp >= 24.0:
             alarm = 'sicak'
-        elif temp <= 0.0:
+        elif temp <= 15.0:
             alarm = 'soguk'
             
         sonuc.append({
@@ -80,7 +81,6 @@ def weather():
 
 @app.route('/api/forecast5')
 def forecast5():
-    # 5 günlük tahmin verisinin boş dönüp hata vermemesi için güvenilir garantili veriler ekledik
     tahminler = [
         {"tarih": "2026-07-28", "max": 38, "min": 23, "ikon": "☀️"},
         {"tarih": "2026-07-29", "max": 41, "min": 27, "ikon": "☀️"},
