@@ -80,13 +80,13 @@ def weather():
 
 @app.route('/api/forecast5')
 def forecast5():
-    # Frontend (JS) tarafının doğrudan okuyabilmesi için hem 'tarih' hem de 'gun' anahtarları eklendi
+    # Frontend'in olası tüm anahtar arama ihtimallerine karşı (tarih, gun, durum, aciklama) eksiksiz dolduruyoruz
     tahminler = [
-        {"tarih": "2026-07-28", "gun": "2026-07-28", "max": 38, "min": 23, "ikon": "☀️"},
-        {"tarih": "2026-07-29", "gun": "2026-07-29", "max": 41, "min": 27, "ikon": "☀️"},
-        {"tarih": "2026-07-30", "gun": "2026-07-30", "max": 39, "min": 26, "ikon": "☀️"},
-        {"tarih": "2026-07-31", "gun": "2026-07-31", "max": 37, "min": 25, "ikon": "☀️"},
-        {"tarih": "2026-08-01", "gun": "2026-08-01", "max": 38, "min": 26, "ikon": "☀️"}
+        {"tarih": "2026-07-28", "gun": "2026-07-28", "durum": "Güneşli", "aciklama": "Güneşli", "max": 38, "min": 23, "ikon": "☀️"},
+        {"tarih": "2026-07-29", "gun": "2026-07-29", "durum": "Güneşli", "aciklama": "Güneşli", "max": 41, "min": 27, "ikon": "☀️"},
+        {"tarih": "2026-07-30", "gun": "2026-07-30", "durum": "Güneşli", "aciklama": "Güneşli", "max": 39, "min": 26, "ikon": "☀️"},
+        {"tarih": "2026-07-31", "gun": "2026-07-31", "durum": "Güneşli", "aciklama": "Güneşli", "max": 37, "min": 25, "ikon": "☀️"},
+        {"tarih": "2026-08-01", "gun": "2026-08-01", "durum": "Güneşli", "aciklama": "Güneşli", "max": 38, "min": 26, "ikon": "☀️"}
     ]
     return jsonify({"tahminler": tahminler})
 
