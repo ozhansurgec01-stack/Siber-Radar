@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -47,9 +46,12 @@
             justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
         }
         .brand-title { font-weight: bold; font-family: monospace; font-size: 13px; letter-spacing: 1px; text-shadow: var(--neon-glow); }
-        .nav-buttons { display: flex; gap: 3px; flex-wrap: wrap; max-width: 58vw; justify-content: flex-end; }
-        .nav-buttons::-webkit-scrollbar { display: none; }
-        .toggle-btn { background: transparent; color: var(--text-color); border: var(--border-style); padding: 4px 6px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 9px; font-family: monospace; box-shadow: var(--neon-glow); white-space: nowrap; flex-shrink: 0; }
+        .nav-buttons { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+        .toggle-btn {
+            background: transparent; color: var(--text-color); border: var(--border-style);
+            padding: 5px 7px; border-radius: 4px; cursor: pointer; font-weight: bold;
+            font-size: 10px; font-family: monospace; box-shadow: var(--neon-glow);
+        }
         .toggle-btn.active-risik { background: #ff4500; color: #fff; border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
         .toggle-btn.active-mgm { background: #eab308; color: #000; border-color: #eab308; box-shadow: 0 0 10px #eab308; }
         .toggle-btn.active-cam { background: #00ecff; color: #000; border-color: #00ecff; box-shadow: 0 0 10px #00ecff; }
@@ -117,17 +119,13 @@
     <div class="top-nav">
         <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;">📡 SİBER RADAR</div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:13px; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
         <div class="nav-buttons">
-            <button class="toggle-btn" id="camList">KAMERALAR</button>
-            <button class="toggle-btn" id="pollen">POLEN</button>
-            <button class="toggle-btn" id="riskBtn">RİSK</button>
-            <button class="toggle-btn" id="yildirimBtn">YILDIRIM (AÇIK)</button>
-            <button id="ziyaretciBtn" class="toggle-btn" onclick="ziyaretcileriGoster()" style="background: linear-gradient(135deg, #ff7e5f, #feb47b); color: white; display: inline-flex; align-items: center; gap: 4px;">
-                👥 <span id="ziyaretciSayisiBadge">0</span>
-            </button>
-            <button class="toggle-btn" id="mgmBtn">5 GÜN</button>
-            <button class="toggle-btn" id="meteoBtn">YAĞIŞ (AÇIK)</button>
-            <button class="toggle-btn" id="liveRain">CANLI YAĞIŞ</button>
-            <button class="toggle-btn" id="modeBtn">SİBER</button>
+            <button class="toggle-btn" id="camListBtn" onclick="togglePanel('cam')">🎥 KAMERALAR</button>
+            <button class="toggle-btn" id="riskBtn" onclick="riskGoster()">📊 RİSK</button>
+            <button class="toggle-btn" id="yildirimBtn" onclick="toggleRadarLayer('yildirim')">⚡ YILDIRIM</button>
+            <button class="toggle-btn" id="mgmBtn" onclick="togglePanel('mgm')">📅 5 GÜN</button>
+            <button class="toggle-btn" id="meteoBtn" onclick="toggleRadarLayer('meteo')">☔ YAĞIŞ</button>
+            <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
+            <button class="toggle-btn" id="modeBtn" onclick="toggleMod()">KLASİK</button>
         </div>
     </div>
 
@@ -139,20 +137,6 @@
             </div>
             <div id="mgmAlertArea"></div>
             <div class="mgm-list" id="mgmForecastContent"><div style="text-align:center; padding:10px;">Veriler yükleniyor...</div></div>
-        </div>
-        <div id="pollen-banner" style="position: absolute; top: 10px; left: 10px; right: 10px; z-index: 999; background: rgba(11, 15, 25, 0.95); border: 2px solid #4ade80; border-radius: 6px; padding: 8px 12px; display: none; font-family: monospace; color: #fff;">
-            <div style="font-weight: bold; font-size: 11px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; margin-bottom: 6px; color: #4ade80;">
-                <span>🌱 AKDENİZ BÖLGESİ POLEN & ALERJİ RAPORU</span>
-                <span style="cursor:pointer; color:#ff4500;" onclick="polenAlarmGoster()">[X]</span>
-            </div>
-            <div style="font-size: 10px; max-height: 130px; overflow-y: auto; line-height: 1.4;">
-                <div style="margin-bottom: 4px; background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center;"><span>🌲 <b>ADANA:</b> Düşük Seviye</span><span style="color:#4ade80; font-weight:bold;">🟢 Güvenli</span></div>
-                <div style="margin-bottom: 4px; background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center;"><span>🌴 <b>MERSİN:</b> Orta Seviye</span><span style="color:#eab308; font-weight:bold;">🟡 Dikkat</span></div>
-                <div style="margin-bottom: 4px; background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center;"><span>🔥 <b>ANTALYA:</b> Düşük Seviye</span><span style="color:#4ade80; font-weight:bold;">🟢 Güvenli</span></div>
-                <div style="margin-bottom: 4px; background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center;"><span>⛰️ <b>HATAY:</b> Orta Seviye</span><span style="color:#eab308; font-weight:bold;">🟡 Dikkat</span></div>
-                <div style="margin-bottom: 4px; background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center;"><span>🌾 <b>K.MARAŞ:</b> Düşük Seviye</span><span style="color:#4ade80; font-weight:bold;">🟢 Güvenli</span></div>
-                <div style="margin-bottom: 4px; background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center;"><span>🌳 <b>OSMANİYE:</b> Düşük Seviye</span><span style="color:#4ade80; font-weight:bold;">🟢 Güvenli</span></div>
-            </div>
         </div>
         <div id="cam-list-banner">
             <div class="cam-list-title" style="color: var(--neon-color);">
@@ -387,25 +371,6 @@
         depremleriYenile();
         setInterval(depremleriYenile, 60000);
 
-        let pollenTimer = null;
-        function polenAlarmGoster() {
-            let b = document.getElementById("pollen-banner");
-            let btn = document.getElementById("pollenBtn");
-            if (b.style.display === "none" || b.style.display === "") {
-                b.style.display = "block";
-                btn.classList.add("active-mgm");
-                if (pollenTimer) clearTimeout(pollenTimer);
-                pollenTimer = setTimeout(() => {
-                    b.style.display = "none";
-                    btn.classList.remove("active-mgm");
-                }, 10000);
-            } else {
-                b.style.display = "none";
-                btn.classList.remove("active-mgm");
-                if (pollenTimer) clearTimeout(pollenTimer);
-            }
-        }
-
         function riskGoster() {
             let r = document.getElementById("miniRisk");
             r.style.display = (r.style.display === "none" || r.style.display === "") ? "flex" : "none";
@@ -424,67 +389,30 @@
 
     <script>
         async function canliYagisKontrol(){
-            let btn=document.getElementById("liveRainBtn");   if(btn) btn.innerHTML="⏳ RADAR";
-            let box=document.createElement("div");            box.style="position:fixed;top:90px;left:50%;transform:translateX(-50%);background:white;color:#111;padding:18px;border-radius:15px;z-index:99999;box-shadow:0 5px 20px #0008;max-width:420px;white-space:nowrap;";
-            box.innerHTML="🌧️ <b>CANLI YAĞIŞ</b><br><br>🔎 Türkiye geneli radar kontrol ediliyor...";
+            let eskiBox = document.getElementById("yagisPopup");
+            if(eskiBox) eskiBox.remove();
+
+            let btn = document.getElementById("liveRainBtn"); if(btn) btn.innerHTML="⏳ RADAR";
+            let box = document.createElement("div");
+            box.id = "yagisPopup";
+            box.style = "position:fixed;top:90px;left:50%;transform:translateX(-50%);background:white;color:#111;padding:18px;border-radius:15px;z-index:99999;box-shadow:0 5px 20px #0008;max-width:420px;white-space:nowrap;";
+            box.innerHTML = "🌧️ <b>CANLI YAĞIŞ</b><br><br>🔎 Türkiye geneli radar kontrol ediliyor...";
             document.body.appendChild(box);
-            try{
-                let r=await fetch("/api/rain-check");
-                let d=await r.json();
+            try {
+                let r = await fetch("/api/rain-check");
+                let d = await r.json();
                 if(d.yerler && d.yerler.length){
-                    let liste=d.yerler.map(x => " 📍 "+x.il+" - "+x.ilce+" <b>"+x.durum+"</b>").join("<br>");
-                    box.innerHTML="🌧️ <b>Yağış tespit edilen bölgeler:</b><br><br>"+ liste+"<br><br>🛰️ RainViewer";
-                }else{
-                    box.innerHTML="☀️ Aktif yağış tespit edilmedi.";
+                    let liste = d.yerler.map(x => " 📍 "+x.il+" - "+x.ilce+" <b>"+x.durum+"</b>").join("<br>");
+                    box.innerHTML = "🌧️ <b>Yağış tespit edilen bölgeler:</b><br><br>"+ liste+"<br><br>🛰️ RainViewer";
+                } else {
+                    box.innerHTML = "☀️ Aktif yağış tespit edilmedi.";
                 }
-            }catch(e){
-                box.innerHTML="⚠️ Radar kontrol hatası";
+            } catch(e) {
+                box.innerHTML = "⚠️ Radar kontrol hatası";
             }
-            setTimeout(()=>box.remove(),10000);
-            if(btn) btn.innerHTML="🌧️ CANLI YAĞIŞ";
+            setTimeout(() => box.remove(), 10000);
+            if(btn) btn.innerHTML = "🌧️ CANLI YAĞIŞ";
         }
     </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    fetch("https://ipapi.co/json/")
-    .then(res => res.json())
-    .then(data => {
-        return fetch("/api/record-visit", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                city: data.city || "Bilinmiyor",
-                country: data.country_name || "Türkiye",
-                flag: "🇹🇷"
-            })
-        });
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.ziyaretciler) {
-            document.getElementById("ziyaretciSayisiBadge").innerText = data.ziyaretciler.length;
-        }
-    })
-    .catch(err => console.log("Ziyaretçi kaydedilemedi"));
-});
-
-function ziyaretcileriGoster() {
-    fetch("/api/get-visits")
-    .then(res => res.json())
-    .then(list => {
-        let metin = "Son Ziyaretçiler:\n\n";
-        if(list.length === 0) {
-            metin += "Henüz kayıtlı ziyaretçi yok.";
-        } else {
-            list.forEach((v, index) => {
-                metin += `${index + 1}. ${v.sehir} / ${v.ulke} - ${v.zaman}\n`;
-            });
-        }
-        alert(metin);
-    });
-}
-</script>
-    
 </body>
 </html>
