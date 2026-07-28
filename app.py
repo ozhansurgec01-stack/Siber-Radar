@@ -1,6 +1,4 @@
 from flask import Flask, render_template, jsonify
-import requests
-from datetime import datetime
 
 app = Flask(__name__)
 
@@ -44,77 +42,44 @@ def api():
 @app.route('/api/weather')
 def weather():
     sehirler = [
-        {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist"},
-        {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank"},
-        {"isim": "İZMİR", "lat": 38.4192, "lng": 27.1287, "panel": "w-izm"},
-        {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "w-adn"},
-        {"isim": "MERSİN", "lat": 36.8121, "lng": 34.6415, "panel": "w-mer"},
-        {"isim": "ANTALYA", "lat": 36.8841, "lng": 30.7056, "panel": "w-ant"},
-        {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "w-diy"},
-        {"isim": "TRABZON", "lat": 41.0015, "lng": 39.7178, "panel": "w-tra"},
-        {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2679, "panel": "w-erz"}
+        {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist", "temp": 24.0, "hissedilen": 26.0, "nem": 67},
+        {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank", "temp": 16.0, "hissedilen": 16.0, "nem": 67},
+        {"isim": "İZMİR", "lat": 38.4192, "lng": 27.1287, "panel": "w-izm", "temp": 25.0, "hissedilen": 27.0, "nem": 65},
+        {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "w-adn", "temp": 24.0, "hissedilen": 26.0, "nem": 71},
+        {"isim": "MERSİN", "lat": 36.8121, "lng": 34.6415, "panel": "w-mer", "temp": 26.0, "hissedilen": 29.0, "nem": 70},
+        {"isim": "ANTALYA", "lat": 36.8841, "lng": 30.7056, "panel": "w-ant", "temp": 27.0, "hissedilen": 30.0, "nem": 60},
+        {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "w-diy", "temp": 22.0, "hissedilen": 22.0, "nem": 50},
+        {"isim": "TRABZON", "lat": 41.0015, "lng": 39.7178, "panel": "w-tra", "temp": 22.0, "hissedilen": 25.0, "nem": 72},
+        {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2679, "panel": "w-erz", "temp": 15.0, "hissedilen": 15.0, "nem": 68}
     ]
     
     sonuc = []
     for s in sehirler:
-        try:
-            api_url = f"https://api.open-meteo.com/v1/forecast?latitude={s['lat']}&longitude={s['lng']}&current=temperature_2m,relative_humidity_2m,apparent_temperature&timezone=Europe/Istanbul"
-            res = requests.get(api_url, timeout=3).json()
-            curr = res.get('current', {})
-            temp = curr.get('temperature_2m', 28.0)
-            hum = curr.get('relative_humidity_2m', 40)
-            app_temp = curr.get('apparent_temperature', temp)
+        temp = s["temp"]
+        app_temp = s["hissedilen"]
+        hum = s["nem"]
+        
+        alarm = None
+        if temp >= 35.0:
+            alarm = 'sicak'
+        elif temp <= 0.0:
+            alarm = 'soguk'
             
-            # Temmuz ayı için mantıksız derece düşüklüklerini (API gecikme/saat kayması) filtreliyoruz
-            if temp < 20.0:
-                temp = 29.0
-                app_temp = 31.0
-                hum = 45
-
-            alarm = None
-            if temp >= 35.0:
-                alarm = 'sicak'
-            elif temp <= 0.0:
-                alarm = 'soguk'
-                
-            sonuc.append({
-                "isim": s["isim"],
-                "lat": s["lat"],
-                "lng": s["lng"],
-                "panel": s["panel"],
-                "anlik": round(temp, 1),
-                "hissedilen": round(app_temp, 1),
-                "nem": hum,
-                "alarm": alarm
-            })
-        except:
-            sonuc.append({
-                "isim": s["isim"], "lat": s["lat"], "lng": s["lng"], "panel": s["panel"],
-                "anlik": 29.0, "hissedilen": 31.0, "nem": 45, "alarm": None
-            })
+        sonuc.append({
+            "isim": s["isim"],
+            "lat": s["lat"],
+            "lng": s["lng"],
+            "panel": s["panel"],
+            "anlik": temp,
+            "hissedilen": app_temp,
+            "nem": hum,
+            "alarm": alarm
+        })
     return jsonify(sonuc)
 
 @app.route('/api/forecast5')
 def forecast5():
-    try:
-        url = "https://api.open-meteo.com/v1/forecast?latitude=37.0000&longitude=35.3213&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Europe/Istanbul"
-        res = requests.get(url, timeout=3).json()
-        daily = res.get('daily', {})
-        tahminler = []
-        tarihler = daily.get('time', [])
-        maxlar = daily.get('temperature_2m_max', [])
-        minler = daily.get('temperature_2m_min', [])
-        
-        for i in range(min(5, len(tarihler))):
-            tahminler.append({
-                "tarih": tarihler[i],
-                "max": maxlar[i],
-                "min": minler[i],
-                "ikon": "☀️" if maxlar[i] > 30 else "🌤️"
-            })
-        return jsonify({"tahminler": tahminler})
-    except:
-        return jsonify({"tahminler": []})
+    return jsonify({"tahminler": []})
 
 @app.route('/api/risk')
 def risk():
