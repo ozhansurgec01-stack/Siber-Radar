@@ -235,8 +235,8 @@ def storm():
     noktalar=[]
 
     lat=35.5
-    while lat<=39.0:
-        lng=26.0
+    while lat<=37.5:
+        lng=28.0
         while lng<=36.5:
             noktalar.append((lat,lng))
             lng+=1.0
@@ -259,13 +259,6 @@ def storm():
                     continue
 
                 isim=d.get("name","Bilinmeyen bölge")
-                ulke=d.get("sys",{}).get("country","")
-
-                if lat < 35.8 or lng < 27.0:
-                    continue
-
-                if ulke and ulke != "TR":
-                    continue
 
                 sonuc.append({
                     "isim":isim,
