@@ -230,10 +230,22 @@ def polen():
 @app.route('/api/storm')
 def storm():
     sonuc=[]
+
+    # Türkiye genelinde örnekleme taraması
+    noktalar=[]
+
+    lat=35.5
+    while lat<=39.0:
+        lng=26.0
+        while lng<=36.5:
+            noktalar.append((lat,lng))
+            lng+=1.0
+        lat+=1.0
+
     try:
-        for s in SEHIRLER:
+        for lat,lng in noktalar:
             try:
-                url=f"http://api.openweathermap.org/data/2.5/weather?lat={s['lat']}&lon={s['lng']}&appid={API_KEY}&units=metric&lang=tr"
+                url=f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lng}&appid={API_KEY}&units=metric&lang=tr"
                 d=requests.get(url,timeout=5).json()
 
                 ruzgar=round(d.get("wind",{}).get("speed",0)*3.6)
@@ -244,14 +256,24 @@ def storm():
                 elif ruzgar >= 40:
                     durum="Fırtına riski"
                 else:
-                    durum="Normal"
+                    continue
+
+                isim=d.get("name","Bilinmeyen bölge")
+                ulke=d.get("sys",{}).get("country","")
+
+                if lat < 35.8 or lng < 27.0:
+                    continue
+
+                if ulke and ulke != "TR":
+                    continue
 
                 sonuc.append({
-                    "isim":s["isim"],
+                    "isim":isim,
                     "ruzgar":ruzgar,
                     "sicaklik":sicaklik,
                     "durum":durum
                 })
+
             except:
                 pass
 
@@ -259,6 +281,7 @@ def storm():
 
     except Exception:
         return jsonify([])
+
 @app.route('/api/get-visits', methods=['GET'])
 def api_get_visits_fix():
     return jsonify([])

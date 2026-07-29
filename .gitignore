@@ -1,9 +1,5 @@
-.cache/
-.termux/
-.ssh/
-.cargo/
-.npm/
-__pycache__/
-*.log
-*.tar.gz
-.git-credentials
+*.db
+*_yedek*
+*_backup*
+*.zip
+templates/*_bak*
