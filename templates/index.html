@@ -349,7 +349,7 @@ body > div:first-of-type {
         function isiHaritasiGuncelle(data){
             let noktalar = data.map(sehir => {
                 let sicaklik = Number(sehir.hissedilen || sehir.anlik || 0);
-                let yogunluk = Math.max(0.05, Math.min(1,(sicaklik-5)/40));
+                let yogunluk = Math.max(0.05, Math.min(1,(sicaklik-10)/30));
                 return [sehir.lat, sehir.lng, yogunluk];
             });
 
@@ -358,8 +358,8 @@ body > div:first-of-type {
             }
 
             isiLayer = L.heatLayer(noktalar,{
-                radius:180,
-                blur:120,
+                radius:200,
+                blur:20,
                 maxZoom:8,
                 gradient:{
                     0:"#0055ff",
@@ -369,7 +369,7 @@ body > div:first-of-type {
                     0.8:"#ff8800",
                     1:"#ff0000"
                 }
-            }).addTo(map); console.log("ISI AKTIF",noktalar);
+            }).addTo(map); console.log("ISI AKTIF",noktalar); console.log("HEAT LAYER OK"); alert("ISI NOKTA: "+noktalar.length);
         }
 
             document.getElementById('cam-title').innerText = "🎥 " + isim;
@@ -485,7 +485,19 @@ body > div:first-of-type {
 window.addEventListener('load', function(){
 
 });
-</script></body>
+</script>
+<script>
+setTimeout(function(){
+fetch('/api/heatmap')
+.then(r=>r.json())
+.then(d=>{
+ if(typeof isiHaritasiGuncelle === 'function'){
+   isiHaritasiGuncelle(d);
+ }
+});
+},2000);
+</script>
+</body>
 </html>
 
 

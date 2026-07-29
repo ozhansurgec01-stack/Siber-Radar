@@ -287,5 +287,39 @@ def inject_kameralar():
     ]
     return dict(kameralar=kameralar_listesi)
 
+
+@app.route('/api/heatmap')
+def heatmap():
+    noktalar = [
+        {"isim":"Marmara","lat":40.9,"lng":29.1},
+        {"isim":"Ege Kuzey","lat":39.5,"lng":27.0},
+        {"isim":"Ege Güney","lat":37.5,"lng":28.0},
+        {"isim":"Akdeniz Batı","lat":36.8,"lng":30.7},
+        {"isim":"Akdeniz Doğu","lat":36.8,"lng":35.5},
+        {"isim":"İç Anadolu Batı","lat":39.0,"lng":32.5},
+        {"isim":"İç Anadolu Doğu","lat":38.5,"lng":41.0},
+        {"isim":"Karadeniz Batı","lat":41.3,"lng":32.5},
+        {"isim":"Karadeniz Doğu","lat":41.0,"lng":39.7},
+        {"isim":"Güneydoğu","lat":37.5,"lng":40.5},
+        {"isim":"Doğu Anadolu","lat":39.5,"lng":43.0}
+    ]
+
+    sonuc=[]
+    for n in noktalar:
+        try:
+            url=f"http://api.openweathermap.org/data/2.5/weather?lat={n['lat']}&lon={n['lng']}&appid={API_KEY}&units=metric&lang=tr"
+            d=requests.get(url,timeout=5).json()
+
+            sonuc.append({
+                "lat": n["lat"],
+                "lng": n["lng"],
+                "anlik": round(d["main"]["temp"]),
+                "hissedilen": round(d["main"]["feels_like"])
+            })
+        except:
+            pass
+
+    return jsonify(sonuc)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
