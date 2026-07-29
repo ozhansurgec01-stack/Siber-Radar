@@ -2,8 +2,41 @@ from datetime import datetime, timedelta
 from flask import Flask, render_template, jsonify
 from datetime import datetime, timedelta
 import requests
+import sqlite3
+import time
 
 app = Flask(__name__)
+
+def ziyaret_db():
+    conn = sqlite3.connect("ziyaret.db")
+    c = conn.cursor()
+    c.execute("CREATE TABLE IF NOT EXISTS ziyaret (id INTEGER PRIMARY KEY AUTOINCREMENT, zaman INTEGER)")
+    conn.commit()
+    return conn
+
+
+def ziyaret_ekle():
+    conn = ziyaret_db()
+    c = conn.cursor()
+    c.execute("INSERT INTO ziyaret (zaman) VALUES (?)", (int(time.time()),))
+    conn.commit()
+    conn.close()
+
+
+def ziyaret_sayilari():
+    conn = ziyaret_db()
+    c = conn.cursor()
+    simdi = int(time.time())
+
+    c.execute("SELECT COUNT(*) FROM ziyaret")
+    toplam = c.fetchone()[0]
+
+    c.execute("SELECT COUNT(*) FROM ziyaret WHERE zaman > ?", (simdi-300,))
+    online = c.fetchone()[0]
+
+    conn.close()
+    return toplam, online
+
 
 API_KEY = "47c985532d16457337f109fb907d8a60"
 
@@ -23,12 +56,14 @@ SEHIRLER = [
 @app.route('/')
 def home():
     import json
+    ziyaret_ekle()
+    toplam, online = ziyaret_sayilari()
     try:
         with open("kameralar.json","r",encoding="utf-8") as f:
             kameralar=json.load(f)
     except:
         kameralar=[]
-    return render_template('index.html', kameralar=kameralar)
+    return render_template('index.html', kameralar=kameralar, toplam_ziyaret=toplam, online=online)
 
 
 @app.route('/api/cameras')
