@@ -534,7 +534,7 @@ function firtinaGoster(){
     fetch('/api/storm')
     .then(r=>r.json())
     .then(data=>{
-        let icerik="<b>🌪️ FIRTINA UYARILARI</b><br><br>";
+        let icerik="<b>🌪️ FIRTINA UYARILARI</b><br>📡 Kaynak: OpenWeather<br><br>";
 
         if(data.length===0){
             icerik+="🌤️ Şu an fırtına uyarısı yok";
