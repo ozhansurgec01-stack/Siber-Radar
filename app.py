@@ -1,295 +1,240 @@
-import os
-import requests
-from flask import Flask, render_template, jsonify, request
 from datetime import datetime, timedelta
+from flask import Flask, render_template, jsonify
+from datetime import datetime, timedelta
+import requests
 
 app = Flask(__name__)
 
-ziyaretciler = []
+API_KEY = "47c985532d16457337f109fb907d8a60"
 
-# 4 Yabancı Kamera
-kameralar = [
-    ["Canlı Yayın Kamerası 7", 37.0000, 35.0000, "https://www.youtube.com/embed/gFRtAAmiFbE?autoplay=1", "yt"],
-    ["Canlı Yayın Kamerası 6", 37.0000, 35.0000, "https://www.youtube.com/embed/DEycz2Ufv98?autoplay=1", "yt"],
-    ["Canlı Yayın Kamerası 5", 40.7580, -73.9855, "https://www.youtube.com/embed/zfSst64NFcE?autoplay=1", "yt"],
-    ["Canlı Yayın Kamerası 4", 37.0000, 35.3213, "https://www.youtube.com/embed/16hHfZzf8-I?autoplay=1", "yt"],
-    ["Canlı Yayın Kamerası 3", 37.0000, 35.3213, "https://www.youtube.com/embed/EO_1LWqsCNE?autoplay=1", "yt"],
-    ["EarthCam Dublin Canlı Yayın", 53.3498, -6.2603, "https://www.youtube.com/embed/3nyPER2kzqk?autoplay=1", "yt"],
-    ["Times Square Canlı Yayın 2", 40.7580, -73.9855, "https://www.youtube.com/embed/lM3khCaiDos?autoplay=1", "yt"],
-    ["YouTube Canlı Yayın Kamerası", 38.7225, 35.4820, "https://www.youtube.com/embed/whIxfJ1IPoU?autoplay=1", "yt"],
-    ["Times Square Canlı Yayın Kamerası", 40.7580, -73.9855, "https://www.youtube.com/embed/z-jYdOI", "yt"]
-]
-# Google Hava Durumu verileriyle güncellenmiş şehir listesi
+# Arayüzdeki hava durumu panelleriyle eşleşen şehir koordinatları ve kodları
 SEHIRLER = [
-    {"isim": "İSTANBUL", "lat": 41.0082, "lng": 28.9784, "panel": "w-ist", "anlik": 29, "hissedilen": 29, "nem": 37},
-    {"isim": "ANKARA", "lat": 39.9334, "lng": 32.8597, "panel": "w-ank", "anlik": 25, "hissedilen": 25, "nem": 35},
-    {"isim": "İZMİR", "lat": 38.4237, "lng": 27.1428, "panel": "w-izm", "anlik": 31, "hissedilen": 31, "nem": 29},
-    {"isim": "ADANA", "lat": 37.0000, "lng": 35.3213, "panel": "w-adn", "anlik": 29, "hissedilen": 30, "nem": 49},
-    {"isim": "MERSİN", "lat": 36.8000, "lng": 34.6333, "panel": "w-mer", "anlik": 30, "hissedilen": 34, "nem": 60},
-    {"isim": "ANTALYA", "lat": 36.8969, "lng": 30.7133, "panel": "w-ant", "anlik": 30, "hissedilen": 32, "nem": 49},
-    {"isim": "DİYARBAKIR", "lat": 37.9144, "lng": 40.2306, "panel": "w-diy", "anlik": 31, "hissedilen": 31, "nem": 20},
-    {"isim": "TRABZON", "lat": 41.0027, "lng": 39.7168, "panel": "w-tra", "anlik": 23, "hissedilen": 25, "nem": 68},
-    {"isim": "ERZURUM", "lat": 39.9043, "lng": 41.2679, "panel": "w-erz", "anlik": 21, "hissedilen": 24, "nem": 42}
+    {"isim": "İstanbul", "lat": 41.0082, "lng": 28.9784, "query": "Istanbul", "panel": "w-ist"},
+    {"isim": "Ankara", "lat": 39.9334, "lng": 32.8597, "query": "Ankara", "panel": "w-ank"},
+    {"isim": "İzmir", "lat": 38.4192, "lng": 27.1287, "query": "Izmir", "panel": "w-izm"},
+    {"isim": "Adana Yüreğir", "lat": 37.0250, "lng": 35.3710, "query": "Yuregir,Adana,TR", "panel": "w-adn"},
+    {"isim": "Mersin", "lat": 36.8121, "lng": 34.6415, "query": "Mersin", "panel": "w-mer"},
+    {"isim": "Antalya", "lat": 36.8841, "lng": 30.7056, "query": "Antalya", "panel": "w-ant"},
+    {"isim": "Diyarbakır", "lat": 37.9144, "lng": 40.2306, "query": "Diyarbakir", "panel": "w-diy"},
+    {"isim": "Trabzon", "lat": 41.0015, "lng": 39.7178, "query": "Trabzon", "panel": "w-tra"},
+    {"isim": "Erzurum", "lat": 39.9043, "lng": 41.2679, "query": "Erzurum", "panel": "w-erz"}
 ]
-
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
 
 @app.route('/')
-def index():
+def home():
+    import json
+    try:
+        with open("/data/data/com.termux/files/home/kameralar.json","r",encoding="utf-8") as f:
+            kameralar=json.load(f)
+    except:
+        kameralar=[]
     return render_template('index.html', kameralar=kameralar)
 
-@app.route('/api')
-def get_depremler():
+
+@app.route('/api/cameras')
+def cameras():
+    import json
     try:
-        res = requests.get("https://api.orhanaydogdu.com.tr/deprem/kandilli/live?limit=50", headers=HEADERS, timeout=5)
-        if res.status_code == 200:
-            data = res.json()
-            depremler = []
-            for d in data.get('result', []):
-                depremler.append({
-                    'zaman': d.get('date', ''),
-                    'yer': d.get('title', ''),
-                    'mag': d.get('mag', 0),
-                    'lat': d.get('geojson', {}).get('coordinates', [0, 0])[1],
-                    'lng': d.get('geojson', {}).get('coordinates', [0, 0])[0]
-                })
-            return jsonify(depremler)
-    except Exception:
-        pass
-    return jsonify([])
+        with open("kameralar.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        return jsonify([
+            {
+                "isim": x[0],
+                "lat": x[1],
+                "lng": x[2],
+                "link": x[3],
+                "type": x[4]
+            }
+            for x in data
+        ])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api')
+def api_status():
+    try:
+        url = "https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
+        r = requests.get(url, timeout=10)
+        veri = r.json()
+
+        liste = []
+
+        for d in veri.get("result", [])[:50]:
+            c = d.get("geojson", {}).get("coordinates", [0,0])
+            liste.append({
+                "zaman": (datetime.strptime(d.get("date_time",""), "%Y-%m-%d %H:%M:%S") + timedelta(hours=3)).strftime("%Y-%m-%d %H:%M:%S"),
+                "yer": d.get("title", ""),
+                "mag": float(d.get("mag", 0)),
+                "lat": float(c[1]),
+                "lng": float(c[0])
+            })
+
+        return jsonify(liste)
+
+    except Exception as e:
+        print("Deprem hata:", e)
+        return jsonify([])
 
 @app.route('/api/weather')
-def get_weather():
+def weather():
     sonuclar = []
-
     for s in SEHIRLER:
         try:
-            url = (
-                f"https://api.open-meteo.com/v1/forecast?"
-                f"latitude={s['lat']}&longitude={s['lng']}"
-                "&current=temperature_2m,relative_humidity_2m,apparent_temperature"
-            )
-
-            r = requests.get(url, timeout=5)
-            cur = r.json().get("current", {})
-
-            anlik = round(cur.get("temperature_2m", s["anlik"]))
-            hissedilen = round(cur.get("apparent_temperature", s["hissedilen"]))
-            nem = round(cur.get("relative_humidity_2m", s["nem"]))
-
-        except Exception as e:
-            print("HATA:", s["isim"], e)
-            anlik = s["anlik"]
-            hissedilen = s["hissedilen"]
-            nem = s["nem"]
-
-        alarm = "sicak" if anlik >= 38 or hissedilen >= 38 else None
-
+            url = f"http://api.openweathermap.org/data/2.5/weather?lat={s['lat']}&lon={s['lng']}&appid={API_KEY}&units=metric&lang=tr"
+            resp = requests.get(url, timeout=3)
+            if resp.status_code == 200:
+                d = resp.json()
+                temp = round(d["main"]["temp"])
+                feels = round(d["main"]["feels_like"])
+                humidity = d["main"]["humidity"]
+                
+                # Alarm mantığı (38 derece üstü sıcak, 0 altı soğuk/don)
+                alarm = None
+                if temp >= 36 or feels >= 36:
+                    alarm = "sicak"
+                elif temp <= 0:
+                    alarm = "soguk"
+                    
+                sonuclar.append({
+                    "isim": s["isim"],
+                    "lat": s["lat"],
+                    "lng": s["lng"],
+                    "anlik": temp,
+                    "hissedilen": feels,
+                    "nem": humidity,
+                    "panel": s["panel"],
+                    "alarm": alarm
+                })
+                continue
+        except Exception:
+            pass
+        
+        # API'ye ulaşılamazsa yedek statik değer
         sonuclar.append({
             "isim": s["isim"],
             "lat": s["lat"],
             "lng": s["lng"],
+            "anlik": 33,
+            "hissedilen": 36,
+            "nem": 50,
             "panel": s["panel"],
-            "anlik": anlik,
-            "hissedilen": hissedilen,
-            "nem": nem,
-            "alarm": alarm
+            "alarm": None
         })
-
+        
     return jsonify(sonuclar)
 
-@app.route('/api/forecast5')
-def get_forecast5():
-    try:
-        url = "https://api.open-meteo.com/v1/forecast?latitude=37.0000&longitude=35.3213&daily=temperature_2m_max,temperature_2m_min,weather_code,weathercode&timezone=auto"
-        r = requests.get(url, headers=HEADERS, timeout=5)
-        if r.status_code == 200:
-            daily = r.json().get('daily', {})
-            tahminler = []
-            dates = daily.get('time', [])
-            maxs = daily.get('temperature_2m_max', [])
-            mins = daily.get('temperature_2m_min', [])
-            codes = daily.get('weather_code') or daily.get('weathercode') or []
-            
-            for i in range(min(5, len(dates))):
-                code = codes[i] if i < len(codes) else 0
-                durum = "Açık / Güneşli" if code <= 3 else ("Yağmurlu" if code in [51,53,55,61,63,65,80,81,82] else "Bulutlu")
-                ikon = "☀️" if code <= 3 else ("🌧️" if code in [51,53,55,61,63,65,80,81,82] else "☁️")
-                tahminler.append({
-                    "tarih": dates[i],
-                    "max": round(maxs[i]),
-                    "min": round(mins[i]),
-                    "durum": durum,
-                    "ikon": ikon
-                })
-            if tahminler:
-                return jsonify({"tahminler": tahminler})
-    except Exception:
-        pass
-
-    # Tahmin API'si yanit vermezse Google Adana tahmin verileri devreye girer
-    today = datetime.now()
-    adana_tahmin = [
-        {"max": 37, "min": 23, "durum": "Açık / Güneşli", "ikon": "☀️"},
-        {"max": 38, "min": 24, "durum": "Açık / Güneşli", "ikon": "☀️"},
-        {"max": 41, "min": 27, "durum": "Açık / Güneşli", "ikon": "☀️"},
-        {"max": 40, "min": 26, "durum": "Açık / Güneşli", "ikon": "☀️"},
-        {"max": 38, "min": 26, "durum": "Açık / Güneşli", "ikon": "☀️"}
-    ]
-    yedek = []
-    for i in range(5):
-        day_str = (today + timedelta(days=i)).strftime('%Y-%m-%d')
-        yedek.append({
-            "tarih": day_str,
-            "max": adana_tahmin[i]["max"],
-            "min": adana_tahmin[i]["min"],
-            "durum": adana_tahmin[i]["durum"],
-            "ikon": adana_tahmin[i]["ikon"]
-        })
-    return jsonify({"tahminler": yedek})
-
 @app.route('/api/risk')
-def get_risk():
-    return jsonify({"dusuk": 72, "orta": 21, "yuksek": 7})
+def risk():
+    return jsonify({"dusuk": 70, "orta": 20, "yuksek": 10})
 
-@app.route('/api/record-visit', methods=['POST'])
-def record_visit():
+@app.route('/api/forecast5')
+def forecast5():
     try:
-        data = request.get_json() or {}
-        city = data.get('city', 'Bilinmeyen')
-        country = data.get('country', 'Türkiye')
-        flag = data.get('flag', '🇹🇷')
-        now_str = datetime.now().strftime('%H:%M:%S')
-        
-        ziyaretciler.insert(0, {'sehir': city, 'ulke': country, 'bayrak': flag, 'zaman': now_str})
-        if len(ziyaretciler) > 20:
-            ziyaretciler.pop()
-        return jsonify({"status": "ok"})
-    except Exception:
-        return jsonify({"status": "error"})
+        url=f"https://api.openweathermap.org/data/2.5/forecast?lat=37.025&lon=35.371&appid={API_KEY}&units=metric&lang=tr"
+        data=requests.get(url,timeout=10).json()
 
-@app.route('/api/visitors')
-def get_visitors():
-    return jsonify({"ziyaretciler": ziyaretciler})
-
-@app.route('/api/rain-check')
-def rain_check():
-    return jsonify({"yerler": []})
-
-@app.route('/api/polen')
-def get_polen():
-    sonuc = []
-
-    polen_veri = {
-        "İSTANBUL": ("düşük", "green"),
-        "ANKARA": ("düşük", "green"),
-        "İZMİR": ("orta", "orange"),
-        "ADANA": ("orta", "orange"),
-        "MERSİN": ("yüksek", "red"),
-        "ANTALYA": ("orta", "orange"),
-        "DİYARBAKIR": ("düşük", "green"),
-        "TRABZON": ("yüksek", "red"),
-        "ERZURUM": ("orta", "orange")
-    }
-
-    for s in SEHIRLER:
-        seviye, renk = polen_veri.get(s["isim"], ("veri_yok", "gray"))
-        sonuc.append({
-            "isim": s["isim"],
-            "lat": s["lat"],
-            "lng": s["lng"],
-            "seviye": seviye,
-            "agac": seviye,
-            "cayir": seviye,
-            "ot": seviye,
-            "alerji": seviye,
-            "renk": renk
-        })
-
-    return jsonify(sonuc)
-
-
-
-@app.route('/api/storm')
-def get_storm():
-    sehirler=[
-        {"isim":"İSTANBUL","lat":41.0082,"lng":28.9784},
-        {"isim":"ANKARA","lat":39.9334,"lng":32.8597},
-        {"isim":"İZMİR","lat":38.4237,"lng":27.1428},
-        {"isim":"TRABZON","lat":41.0027,"lng":39.7168},
-        {"isim":"ANTALYA","lat":36.8969,"lng":30.7133}
-    ]
-
-    sonuc=[]
-
-    for x in sehirler:
-        try:
-            url=f"https://api.open-meteo.com/v1/forecast?latitude={x['lat']}&longitude={x['lng']}&current=wind_speed_10m,temperature_2m"
-            r=requests.get(url,timeout=5).json()
-
-            ruzgar=r["current"]["wind_speed_10m"]
-
-            if ruzgar >= 70:
-                durum="fırtına"
-                renk="red"
-            elif ruzgar >= 40:
-                durum="kuvvetli rüzgar"
-                renk="orange"
+        gunler={}
+        for x in data["list"]:
+            tarih=x["dt_txt"].split(" ")[0]
+            if tarih not in gunler:
+                gunler[tarih]={
+                    "min":round(x["main"]["temp_min"]),
+                    "max":round(x["main"]["temp_max"]),
+                    "durum":x["weather"][0]["description"]
+                }
             else:
-                durum="normal"
-                renk="green"
+                gunler[tarih]["min"]=min(gunler[tarih]["min"],round(x["main"]["temp_min"]))
+                gunler[tarih]["max"]=max(gunler[tarih]["max"],round(x["main"]["temp_max"]))
 
+        sonuc=[]
+        for tarih,v in list(gunler.items())[:5]:
             sonuc.append({
-                "isim":x["isim"],
-                "ruzgar":ruzgar,
-                "sicaklik":r["current"]["temperature_2m"],
-                "durum":durum,
-                "renk":renk,
-                "lat":x["lat"],
-                "lng":x["lng"]
+                "ikon":"☀️",
+                "tarih":tarih,
+                "durum":v["durum"],
+                "min":v["min"],
+                "max":v["max"]
             })
 
-        except:
-            pass
-
-    return jsonify(sonuc)
-
-
-
-@app.route('/api/temperature-map')
-def temperature_map():
-    try:
-        import requests
-
-        url="https://api.open-meteo.com/v1/forecast?latitude=39&longitude=35&hourly=temperature_2m&forecast_days=1"
-        # Türkiye grid verisi için örnek noktalar
-        noktalar=[]
-
-        for lat in range(36,43,1):
-            for lng in range(26,46,1):
-                try:
-                    u=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&hourly=temperature_2m&forecast_days=1"
-                    r=requests.get(u,timeout=5).json()
-                    sic=r["hourly"]["temperature_2m"][0]
-
-                    noktalar.append({
-                        "lat":lat,
-                        "lng":lng,
-                        "sicaklik":sic
-                    })
-                except:
-                    pass
-
-        return jsonify(noktalar)
+        return jsonify({"tahminler":sonuc})
 
     except Exception as e:
-        return jsonify({"hata":str(e)})
+        return jsonify({"tahminler":[]})
+@app.route('/api/rain-check')
+def rain_check():
+    try:
+        url = f"http://api.openweathermap.org/data/2.5/weather?lat=37.025&lon=35.371&appid={API_KEY}&units=metric&lang=tr"
+        r = requests.get(url, timeout=10).json()
 
+        hava = r.get("weather", [{}])[0].get("description", "").lower()
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+        if any(x in hava for x in ["yağmur", "rain", "sağanak", "drizzle", "fırtına"]):
+            durum = "Yağmur yağıyor"
+        else:
+            durum = "Yağış yok / Açık"
 
+        return jsonify({
+            "yerler": [
+                {
+                    "il": "Adana",
+                    "ilçe": "Merkez",
+   "ilce": "Merkez",
+                    "durum": durum
+                }
+            ]
+        })
 
+    except Exception as e:
+        return jsonify({"yerler":[{"il":"Adana","ilçe":"Merkez","ilce":"Merkez","durum":"Veri alınamadı"}]})
 
+@app.route('/api/polen')
+def polen():
+    return jsonify([{"isim": "Adana Merkez", "agac": "Orta", "cayir": "Yüksek", "ot": "Düşük", "alerji": "Orta Risk"}])
 
+@app.route('/api/storm')
+def storm():
+    sonuc=[]
+    try:
+        for s in SEHIRLER:
+            try:
+                url=f"http://api.openweathermap.org/data/2.5/weather?lat={s['lat']}&lon={s['lng']}&appid={API_KEY}&units=metric&lang=tr"
+                d=requests.get(url,timeout=5).json()
+
+                ruzgar=round(d.get("wind",{}).get("speed",0)*3.6)
+                sicaklik=round(d.get("main",{}).get("temp",0))
+
+                if ruzgar >= 60:
+                    durum="Fırtına uyarısı"
+                elif ruzgar >= 40:
+                    durum="Fırtına riski"
+                else:
+                    durum="Normal"
+
+                sonuc.append({
+                    "isim":s["isim"],
+                    "ruzgar":ruzgar,
+                    "sicaklik":sicaklik,
+                    "durum":durum
+                })
+            except:
+                pass
+
+        return jsonify(sonuc)
+
+    except Exception:
+        return jsonify([])
+@app.route('/api/get-visits', methods=['GET'])
+def api_get_visits_fix():
+    return jsonify([])
+
+@app.context_processor
+def inject_kameralar():
+    kameralar_listesi = [
+        ["Adana Sismik İstasyonu", 37.0, 35.3, "", "radar"],
+        ["İstanbul Boğaz Kamerası", 41.0, 29.0, "https://www.youtube.com/embed/live_stream?channel=UC...", "yt"]
+    ]
+    return dict(kameralar=kameralar_listesi)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)

@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
+.leaflet-popup-content{max-width:220px!important;width:220px!important;font-size:13px!important}.leaflet-popup-content-wrapper{border-radius:12px!important}.leaflet-popup{margin-bottom:10px!important}
             --bg-main: #030712;
             --bg-panel: #0b0f19;
             --neon-color: #00ecff;
@@ -114,19 +115,10 @@
         .city-label-tooltip { background: #0b0f19 !important; border: 1px solid #00ecff !important; color: #ffffff !important; font-family: monospace !important; font-size: 10px !important; padding: 3px 6px !important; border-radius: 4px !important; }
     </style>
 <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-<style>
-.leaflet-popup-content{
- max-width:350px !important;
- max-height:400px;
- overflow-y:auto;
- font-size:12px; line-height:1.25;
-}
-</style>
-</head>
 <body>
 
     <div class="top-nav">
-        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;">📡 SİBER RADAR</div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:12px; line-height:1.25; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
+        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;">📡 SİBER RADAR</div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:13px; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
         <div class="nav-buttons">
             <button class="toggle-btn" id="camListBtn" onclick="togglePanel('cam')">🎥 KAMERALAR</button>
             <button class="toggle-btn" id="riskBtn" onclick="riskGoster()">📊 RİSK</button>
@@ -317,6 +309,34 @@
 
         var havaDurumuKatmani = L.layerGroup().addTo(map);
         function canlıYayınAc(url, isim) {
+        var isiLayer = null;
+
+        function isiHaritasiGuncelle(data){
+            let noktalar = data.map(sehir => {
+                let sicaklik = Number(sehir.hissedilen || sehir.anlik || 0);
+                let yogunluk = Math.max(0.05, Math.min(1,(sicaklik-5)/40));
+                return [sehir.lat, sehir.lng, yogunluk];
+            });
+
+            if(isiLayer){
+                map.removeLayer(isiLayer);
+            }
+
+            isiLayer = L.heatLayer(noktalar,{
+                radius:180,
+                blur:120,
+                maxZoom:8,
+                gradient:{
+                    0:"#0055ff",
+                    0.25:"#00ffff",
+                    0.45:"#00ff00",
+                    0.65:"#ffff00",
+                    0.8:"#ff8800",
+                    1:"#ff0000"
+                }
+            }).addTo(map); console.log("ISI AKTIF",noktalar);
+        }
+
             document.getElementById('cam-title').innerText = "🎥 " + isim;
             document.getElementById('cam-frame').src = url;
             document.getElementById('cam-container').style.display = 'flex';
@@ -330,6 +350,7 @@
             fetch('/api/weather')
                 .then(res => res.json())
                 .then(data => {
+                    if(typeof isiHaritasiGuncelle === 'function'){ isiHaritasiGuncelle(data); }
                     havaDurumuKatmani.clearLayers();
                     data.forEach(sehir => {
                         if (sehir.panel) {
@@ -425,7 +446,11 @@
             if(btn) btn.innerHTML = "🌧️ CANLI YAĞIŞ";
         }
     </script>
-</body>
+<script>
+window.addEventListener('load', function(){
+
+});
+</script></body>
 </html>
 
 
@@ -469,50 +494,34 @@ fetch('/api/storm')
 });
 
 function firtinaGoster(){
-
-    let data=firtinaVerisi;
+    fetch('/api/storm')
+    .then(r=>r.json())
+    .then(data=>{
 
         let liste=data.filter(x =>
-            x.durum==="fırtına" ||
+            x.durum==="Fırtına uyarısı" ||
+            x.durum==="Fırtına riski" ||
             x.durum==="kuvvetli rüzgar"
         );
 
-        let icerik=`
-<b>🌪️ METEOROLOJİK UYARI</b><br><br>
-📍 Akdeniz İç Kesimleri<br>
-⚠️ Kuvvetli Rüzgar / Fırtına<br><br>
-💨 40-70 km/s<br>
-🔴 Yer yer 80 km/s<br><br>
-📅 29.07.2026<br><br>
-<b>Etkilenen bölgeler:</b><br>
-• Mersin iç ve yüksek kesimleri<br>
-• Adana kuzey ilçeleri<br>
-• Kahramanmaraş iç kesimleri<br><br>
-<hr>
-<b>🌪️ FIRTINA NOKTALARI</b><br><br>`;
+        let icerik="<b>🌪️ FIRTINA UYARILARI</b><br><br>";
 
         if(liste.length===0){
-            icerik+="🌤️ Şu an fırtına uyarısı bulunmuyor";
+            icerik+="🌤️ Şu an fırtına uyarısı yok";
         }else{
             liste.forEach(x=>{
-                icerik+=`
-                📍 <b>${x.isim}</b><br>
+                icerik+=`📍 <b>${x.isim}</b><br>
                 💨 Rüzgar: ${x.ruzgar} km/s<br>
                 🌡️ Sıcaklık: ${x.sicaklik}°C<br>
                 ⚠️ Durum: ${x.durum}<br><br>`;
             });
         }
 
-    L.popup({
-        autoPan:false,
-        closeOnClick:true
-    })
-    .setLatLng(map.containerPointToLatLng([map.getSize().x/2, map.getSize().y/2 + 180]))
-    .setContent(icerik)
-    .openOn(map);
+        L.popup({maxWidth:220})
+        .setLatLng(map.getCenter())
+        .setContent(icerik)
+        .openOn(map);
 
-    setTimeout(()=>{
-        map.closePopup();
-    },10000);
+    });
 }
 </script>
