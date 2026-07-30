@@ -47,7 +47,7 @@
             justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
         }
         .brand-title { font-weight: bold; font-family: monospace; font-size: 13px; letter-spacing: 1px; text-shadow: var(--neon-glow); }
-        .nav-buttons { display: flex; gap: 4px; flex-wrap: nowrap; justify-content: flex-start; overflow-x:auto; }
+        .nav-buttons { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
         .toggle-btn {
             background: transparent; color: var(--text-color); border: var(--border-style);
             padding: 5px 7px; border-radius: 4px; cursor: pointer; font-weight: bold;
@@ -57,7 +57,7 @@
         .toggle-btn.active-mgm { background: #eab308; color: #000; border-color: #eab308; box-shadow: 0 0 10px #eab308; }
         .toggle-btn.active-cam { background: #00ecff; color: #000; border-color: #00ecff; box-shadow: 0 0 10px #00ecff; }
         .toggle-btn.active-lightning { background: #facc15; color: #000; border-color: #facc15; box-shadow: 0 0 10px #facc15; }
-        .map-container { position: relative; height: 45vh; width: 100%; flex-shrink: 0; }
+        .map-container { position: relative; height: 38vh; width: 100%; flex-shrink: 0; }
         #map { height: 100%; width: 100%; background-color: #030712 !important; }
         #mgm-banner, #cam-list-banner {
             position: absolute; top: 10px; left: 10px; right: 10px; z-index: 999;
@@ -113,47 +113,12 @@
             border-radius: 50%; text-align: center; line-height: 19px; font-size: 11px; animation: coldPulse 1.4s infinite ease-in-out;
         }
         .city-label-tooltip { background: #0b0f19 !important; border: 1px solid #00ecff !important; color: #ffffff !important; font-family: monospace !important; font-size: 10px !important; padding: 3px 6px !important; border-radius: 4px !important; }
-    
-.top-nav,
-.top-nav + *,
-body > div:first-of-type {
-    background:#050912 !important;
-}
-.top-nav {
-    background:#050912 !important;
-}
-
-.ust-bilgi {
-    color:#facc15 !important;
-}
-
-.top-nav {
-    color:#facc15 !important;
-}
-
-.top-nav button {
-    color:#facc15;
-}
-
-#modeBtn {
-    background:#facc15 !important;
-    background-image:none !important;
-    color:#000 !important;
-    border:2px solid #facc15 !important;
-    box-shadow:0 0 15px #facc15 !important;
-    opacity:1 !important;
-}
-</style>
+    </style>
 <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 <body>
-<div style="height:35px;display:flex;align-items:center;padding-left:25px;padding-right:15px;color:#00eaff;font-weight:bold;font-size:14px;">
-<span style="display:inline-block;width:16px;height:16px;border-radius:5px;background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd4);color:white;text-align:center;line-height:16px;font-size:11px;">◎</span>
-<a href="https://instagram.com/totik.01" target="_blank" style="color:#facc15;text-decoration:none;">◎ @totik.01</a>&nbsp;&nbsp; 👥 {{ toplam_ziyaret }} &nbsp; 🟢 {{ online }}<button class="toggle-btn" id="modeBtn" onclick="toggleMod()" style="margin-left:auto;">KLASİK</button>
-</div>
-
 
     <div class="top-nav">
-        <div style="display:flex; flex-direction:column; align-items:flex-start;"></div>
+        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;">📡 SİBER RADAR</div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:13px; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
         <div class="nav-buttons">
             <button class="toggle-btn" id="camListBtn" onclick="togglePanel('cam')">🎥 KAMERALAR</button>
             <button class="toggle-btn" id="riskBtn" onclick="riskGoster()">📊 RİSK</button>
@@ -163,7 +128,7 @@ body > div:first-of-type {
             <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
 <button class="toggle-btn" id="stormBtn" onclick="firtinaGoster()">🌪️ FIRTINA</button>
 <button class="toggle-btn" onclick="polenGoster()">🌿 POLEN</button>
-            
+            <button class="toggle-btn" id="modeBtn" onclick="toggleMod()">KLASİK</button>
         </div>
     </div>
 
@@ -349,7 +314,7 @@ body > div:first-of-type {
         function isiHaritasiGuncelle(data){
             let noktalar = data.map(sehir => {
                 let sicaklik = Number(sehir.hissedilen || sehir.anlik || 0);
-                let yogunluk = Math.max(0.05, Math.min(1,(sicaklik-10)/30));
+                let yogunluk = Math.max(0.05, Math.min(1,(sicaklik-5)/40));
                 return [sehir.lat, sehir.lng, yogunluk];
             });
 
@@ -358,8 +323,8 @@ body > div:first-of-type {
             }
 
             isiLayer = L.heatLayer(noktalar,{
-                radius:200,
-                blur:20,
+                radius:180,
+                blur:120,
                 maxZoom:8,
                 gradient:{
                     0:"#0055ff",
@@ -369,7 +334,7 @@ body > div:first-of-type {
                     0.8:"#ff8800",
                     1:"#ff0000"
                 }
-            }).addTo(map); console.log("ISI AKTIF",noktalar); console.log("HEAT LAYER OK"); alert("ISI NOKTA: "+noktalar.length);
+            }).addTo(map); console.log("ISI AKTIF",noktalar);
         }
 
             document.getElementById('cam-title').innerText = "🎥 " + isim;
@@ -485,19 +450,7 @@ body > div:first-of-type {
 window.addEventListener('load', function(){
 
 });
-</script>
-<script>
-setTimeout(function(){
-fetch('/api/heatmap')
-.then(r=>r.json())
-.then(d=>{
- if(typeof isiHaritasiGuncelle === 'function'){
-   isiHaritasiGuncelle(d);
- }
-});
-},2000);
-</script>
-</body>
+</script></body>
 </html>
 
 
@@ -540,18 +493,23 @@ fetch('/api/storm')
     firtinaVerisi=data;
 });
 
-window.firtinaAcik = false;
-
 function firtinaGoster(){
     fetch('/api/storm')
     .then(r=>r.json())
     .then(data=>{
-        let icerik="<b>🌪️ FIRTINA UYARILARI</b><br>📡 Kaynak: OpenWeather<br><br>";
 
-        if(data.length===0){
+        let liste=data.filter(x =>
+            x.durum==="Fırtına uyarısı" ||
+            x.durum==="Fırtına riski" ||
+            x.durum==="kuvvetli rüzgar"
+        );
+
+        let icerik="<b>🌪️ FIRTINA UYARILARI</b><br><br>";
+
+        if(liste.length===0){
             icerik+="🌤️ Şu an fırtına uyarısı yok";
-        } else {
-            data.forEach(x=>{
+        }else{
+            liste.forEach(x=>{
                 icerik+=`📍 <b>${x.isim}</b><br>
                 💨 Rüzgar: ${x.ruzgar} km/s<br>
                 🌡️ Sıcaklık: ${x.sicaklik}°C<br>
@@ -564,9 +522,6 @@ function firtinaGoster(){
         .setContent(icerik)
         .openOn(map);
 
-        setTimeout(()=>{
-            map.closePopup();
-        },10000);
     });
 }
 </script>
