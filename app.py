@@ -28,7 +28,7 @@ def ip_konum_bilgi(ip):
             "lon": data.get("longitude",0),
             "isp": data.get("org","Bilinmiyor")
         }
-    except:
+    except Exception as e:
         return {"ulke":"Bilinmiyor","sehir":"Bilinmiyor","lat":0,"lon":0,"isp":"Bilinmiyor"}
 
 def ziyaretci_kaydet():
@@ -108,7 +108,7 @@ def home():
     try:
         with open(os.path.join(os.path.dirname(__file__),"kameralar.json"),"r",encoding="utf-8") as f:
             kameralar=json.load(f)
-    except:
+    except Exception as e:
         kameralar=[]
     ziyaretci_kaydet()
     return render_template('index.html', kameralar=kameralar)
@@ -169,8 +169,8 @@ def weather():
             zaman=datetime.fromisoformat(cache.get("zaman",""))
             if (datetime.now()-zaman).total_seconds() < 300:
                 return jsonify(cache["veri"])
-    except:
-        pass
+    except Exception as e:
+        pass # hata: print(e)
 
     sonuclar = []
 
@@ -203,8 +203,8 @@ def weather():
                     "alarm": alarm
                 })
 
-        except:
-            pass
+        except Exception as e:
+            pass # hata: print(e)
 
     try:
         with open(HAVA_CACHE,"w",encoding="utf-8") as f:
@@ -212,8 +212,8 @@ def weather():
                 "zaman": datetime.now().isoformat(),
                 "veri": sonuclar
             },f,ensure_ascii=False,indent=2)
-    except:
-        pass
+    except Exception as e:
+        pass # hata: print(e)
 
     return jsonify(sonuclar)
 
@@ -306,8 +306,8 @@ def storm():
                     "sicaklik":sicaklik,
                     "durum":durum
                 })
-            except:
-                pass
+            except Exception as e:
+                pass # hata: print(e)
 
         return jsonify(sonuc)
 
@@ -374,8 +374,8 @@ def otomatik_kayit():
         sehir = geo.get("city","Bilinmiyor")
         ulke = geo.get("country_name","Bilinmiyor")
 
-    except:
-        pass
+    except Exception as e:
+        pass # hata: print(e)
 
 
     try:
@@ -386,7 +386,7 @@ def otomatik_kayit():
         ) as f:
             liste=json.load(f)
 
-    except:
+    except Exception as e:
         liste=[]
 
 
@@ -441,7 +441,7 @@ def ziyaretciler_api():
     try:
         with open("ziyaretciler.json", "r", encoding="utf-8") as f:
             return json.load(f)
-    except:
+    except Exception as e:
         return []
 
 
@@ -538,8 +538,8 @@ def online_sayisi():
                 if (simdi-zaman).total_seconds() <= 300:
                     sayi += 1
                     aktif=x
-            except:
-                pass
+            except Exception as e:
+                pass # hata: print(e)
 
         konum=""
         if aktif:
