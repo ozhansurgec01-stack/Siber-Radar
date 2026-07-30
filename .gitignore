@@ -1,5 +1,6 @@
-*.db
-*_yedek*
-*_backup*
-*.zip
-templates/*_bak*
+.gradle/
+build/
+local.properties
+*.apk
+*.keystore
+.idea/
