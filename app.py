@@ -98,7 +98,8 @@ SEHIRLER = [
     {"isim": "Antalya", "lat": 36.8841, "lng": 30.7056, "query": "Antalya", "panel": "w-ant"},
     {"isim": "Diyarbakır", "lat": 37.9144, "lng": 40.2306, "query": "Diyarbakir", "panel": "w-diy"},
     {"isim": "Trabzon", "lat": 41.0015, "lng": 39.7178, "query": "Trabzon", "panel": "w-tra"},
-    {"isim": "Erzurum", "lat": 39.9043, "lng": 41.2679, "query": "Erzurum", "panel": "w-erz"}
+    {"isim": "Balıkesir", "lat": 39.6484, "lng": 27.8826, "query": "Balikesir", "panel": "w-bal"},
+{"isim": "Erzurum", "lat": 39.9043, "lng": 41.2679, "query": "Erzurum", "panel": "w-erz"}
 ]
 
 @app.route('/')
