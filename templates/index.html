@@ -592,8 +592,10 @@ var yanginKatmani = L.layerGroup();
 
 window.canliYanginKontrol = function() { 
     var xhr = new XMLHttpRequest();
+    alert("CANLI YANGIN FONKSİYONU ÇALIŞTI");
     xhr.open("GET", "/api/yanginin", true);
     xhr.onload = function() {
+        alert("API cevap kodu: " + xhr.status);
         if (xhr.status !== 200) {
             alert("⚠️ Yangın servisi yanıt vermedi.");
             return;

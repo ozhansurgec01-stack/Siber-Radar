@@ -48,9 +48,21 @@ public class MainActivity extends AppCompatActivity {
         WebSettings ayar = web.getSettings();
         ayar.setJavaScriptEnabled(true);
         ayar.setDomStorageEnabled(true);
+        ayar.setAllowFileAccess(true);
+        ayar.setAllowContentAccess(true);
+        ayar.setCacheMode(WebSettings.LOAD_NO_CACHE);
         ayar.setMediaPlaybackRequiresUserGesture(false);
 
-        web.setWebViewClient(new WebViewClient());
+        web.setWebViewClient(new WebViewClient() {
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+        view.evaluateJavascript(
+            "javascript:console.log('WEBVIEW OK')",
+            null
+        );
+    }
+});
         web.setWebContentsDebuggingEnabled(true);
         web.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
 
@@ -61,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         web.clearCache(true);
         web.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-        web.loadUrl("https://siber-radar.onrender.com/");
+        web.loadUrl("https://siber-radar-1.onrender.com/");
     }
 
     @Override
