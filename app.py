@@ -583,37 +583,37 @@ def heatmap():
 @app.route("/api/yanginin")
 def yangin_alarm():
     try:
-        url = "https://firms.modaps.eosdis.nasa.gov/api/area/csv/763d612c3fd36fdca0ce4239ebac5263/VIIRS_SNPP_NRT/25,35,45,43/1"
         import pandas as pd
         import io, requests
 
-        res = requests.get(url, timeout=5)
-        print("NASA STATUS:", res.status_code)
-        print("NASA LENGTH:", len(res.text))
-        print("NASA HEAD:", res.text[:300])
+        url = "https://firms.modaps.eosdis.nasa.gov/api/area/csv/763d612c3fd36fdca0ce4239ebac5263/VIIRS_SNPP_NRT/24,34,46,43/1"
 
-        if res.status_code == 200 and len(res.text) > 50:
-            df = pd.read_csv(io.StringIO(res.text))
+        res = requests.get(url, timeout=10)
 
-            # Test için filtre kaldırıldı
+        if res.status_code != 200:
+            return jsonify({
+                "error": "NASA FIRMS bağlantı hatası",
+                "status": res.status_code
+            }), 500
 
-            return jsonify([
-                {
-                    "aktif": True,
-                    "lat": float(r.latitude),
-                    "lng": float(r.longitude),
-                    "frp": float(r.frp)
-                }
-                for _, r in df.iterrows()
-            ])
+        df = pd.read_csv(io.StringIO(res.text))
+
+        return jsonify([
+            {
+                "aktif": True,
+                "lat": float(row["latitude"]),
+                "lng": float(row["longitude"]),
+                "frp": float(row["frp"])
+            }
+            for _, row in df.iterrows()
+        ])
 
     except Exception as e:
         import traceback
-        traceback.print_exc()
-        print("Yangın hata:", repr(e))
-
-    return jsonify([])
-
+        return jsonify({
+            "error": repr(e),
+            "trace": traceback.format_exc()
+        }), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
