@@ -588,6 +588,9 @@ def yangin_alarm():
         import io, requests
 
         res = requests.get(url, timeout=5)
+        print("NASA STATUS:", res.status_code)
+        print("NASA LENGTH:", len(res.text))
+        print("NASA HEAD:", res.text[:300])
 
         if res.status_code == 200 and len(res.text) > 50:
             df = pd.read_csv(io.StringIO(res.text))
