@@ -588,9 +588,10 @@ fetch('/api/heatmap')
 
 
 <script>
-var yanginKatmani = L.layerGroup();
+var yanginKatmani = null;
 
 window.canliYanginKontrol = function() { 
+    if (!yanginKatmani) { yanginKatmani = L.layerGroup(); }
     var xhr = new XMLHttpRequest();
     alert("CANLI YANGIN FONKSİYONU ÇALIŞTI");
     xhr.open("GET", "/api/yanginin", true);
