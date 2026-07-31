@@ -178,7 +178,7 @@ body > div:first-of-type {
 
 </style>
 <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-<body><h1 style='color:red'>APK TEST YENI SURUM</h1>
+<body>
 <div style="min-height:42px;display:flex;align-items:center;padding:10px 15px;color:#00eaff;font-weight:bold;font-size:15px;flex-wrap:wrap;">
 <span style="display:inline-block;width:16px;height:16px;border-radius:5px;background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd4);color:white;text-align:center;line-height:16px;font-size:11px;">◎</span>
 <a href="https://instagram.com/totik.01" target="_blank" style="color:#facc15;text-decoration:none;">◎ @totik.01</a>&nbsp;&nbsp; 👥 {{ toplam_ziyaret }} &nbsp; 🟢 ONLINE: {{ online }}
@@ -195,7 +195,8 @@ body > div:first-of-type {
             <button class="toggle-btn" id="meteoBtn" onclick="toggleRadarLayer('meteo')">☔ YAĞIŞ</button>
             <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
 <button class="toggle-btn" id="stormBtn" onclick="firtinaGoster()">🌪️ FIRTINA</button>
-<button style="position:fixed;top:10px;right:10px;z-index:999999;background:red;color:white;width:120px;height:60px" onclick="alert('TEST OK')">TEST</button>
+
+<button class="toggle-btn" id="yanginBtn" onclick="canliYanginKontrol()">🔥 CANLI YANGIN</button>
 <button class="toggle-btn" id="modeBtn2" onclick="toggleMod()">🎨 KLASİK</button>
             
         </div>
