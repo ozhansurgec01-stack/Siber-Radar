@@ -606,7 +606,7 @@ def yangin_alarm():
             lng = float(row["longitude"])
 
             # Türkiye yaklaşık sınır filtresi
-            if 35.5 <= lat <= 42.2 and 25.5 <= lng <= 45.0:
+            if 35.8 <= lat <= 42.1 and 26.0 <= lng <= 44.8:
                 iller = [
             ("Balıkesir", 39.65, 27.88),
             ("İzmir", 38.42, 27.14),
@@ -622,11 +622,12 @@ def yangin_alarm():
                 il = isim
                 break
 
-        yanginlar.append({
-            "aktif": True,
-            "il": il,
-            "frp": float(row["frp"])
-        })
+        if il != "Bilinmeyen":
+            yanginlar.append({
+                "aktif": True,
+                "il": il,
+                "frp": float(row["frp"])
+            })
 
         return jsonify(yanginlar)
 
