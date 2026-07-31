@@ -192,6 +192,7 @@ body > div:first-of-type {
             <button class="toggle-btn" id="meteoBtn" onclick="toggleRadarLayer('meteo')">☔ YAĞIŞ</button>
             <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
 <button class="toggle-btn" id="stormBtn" onclick="firtinaGoster()">🌪️ FIRTINA</button>
+<button class="toggle-btn" id="yanginBtn" onclick="canliYanginKontrol()">🔥 CANLI YANGIN</button>
 <button class="toggle-btn" id="modeBtn2" onclick="toggleMod()">🎨 KLASİK</button>
             
         </div>
@@ -579,6 +580,45 @@ fetch('/api/heatmap')
 });
 },2000);
 </script>
+
+
+
+<script>
+var yanginKatmani = L.layerGroup();
+
+function canliYanginKontrol() {
+    fetch("/api/yanginin")
+        .then(r => r.json())
+        .then(data => {
+            yanginKatmani.clearLayers();
+            
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(y => {
+                    var marker = L.circleMarker([y.lat, y.lng], {
+                        radius: 8,
+                        color: "#ff0000",
+                        fillColor: "#ff4500",
+                        fillOpacity: 0.9
+                    });
+                    
+                    marker.bindPopup("<b>🔥 Aktif Termal Anomali</b><br>Sıcaklık: " + y.parlaklik + " K<br>Güç (FRP): " + y.frp + " MW");
+                    yanginKatmani.addLayer(marker);
+                });
+                
+                yanginKatmani.addTo(map);
+                alert("🚨 " + data.length + " adet aktif yangın/termal odak tespit edildi!");
+            } else {
+                alert("✅ Şu an için Türkiye genelinde aktif yangın bulunamadı.");
+            }
+        })
+        .catch(err => {
+            alert("⚠️ Yangın verisi alınırken hata oluştu.");
+        });
+}
+</script>
+
+
+
 </body>
 </html>
 

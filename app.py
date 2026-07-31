@@ -577,5 +577,43 @@ def heatmap():
     return jsonify([])
 
 
+
+
+@app.route('/api/yanginin')
+@app.route('/api/yanginin')
+def yangin_alarm():
+    try:
+        FIRMS_KEY = "df249ee8cc2104dd8329b6aaf1fbe643"
+
+        if FIRMS_KEY == "BURAYA_FIRMS_KEY":
+            return jsonify([])
+
+        url = f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{FIRMS_KEY}/VIIRS_SNPP_NRT/25,35,45,43/1"
+
+        r = requests.get(url, timeout=10)
+
+        yanginlar = []
+
+        satirlar = r.text.splitlines()
+
+        for satir in satirlar[1:]:
+            veri = satir.split(",")
+
+            if len(veri) > 12:
+                yanginlar.append({
+                    "aktif": True,
+                    "yer": "Uydu yangın tespiti",
+                    "lat": float(veri[0]),
+                    "lng": float(veri[1]),
+                    "guven": veri[9],
+                    "zaman": veri[5]+" "+veri[6]
+                })
+
+        return jsonify(yanginlar)
+
+    except Exception:
+        return jsonify([])
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
