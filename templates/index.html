@@ -196,7 +196,7 @@ body > div:first-of-type {
             <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
 <button class="toggle-btn" id="stormBtn" onclick="firtinaGoster()">🌪️ FIRTINA</button>
 
-<button class="toggle-btn" id="yanginBtn" onclick="canliYanginKontrol()">🔥 CANLI YANGIN</button>
+<button class="toggle-btn" id="yanginBtn" onclick="canliYanginKontrol();return false;">🔥 CANLI YANGIN</button>
 <button class="toggle-btn" id="modeBtn2" onclick="toggleMod()">🎨 KLASİK</button>
             
         </div>
@@ -593,7 +593,7 @@ var yanginKatmani = null;
 function canliYanginKontrol() { 
     if (!yanginKatmani) { yanginKatmani = L.layerGroup(); }
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/api/yanginin", true);
+    xhr.open("GET", window.location.origin + "/api/yanginin", true);
     xhr.onload = function() {
         if (xhr.status !== 200) {
             alert("⚠️ Yangın servisi yanıt vermedi.");
@@ -618,9 +618,9 @@ function canliYanginKontrol() {
                 });
                 
                 yanginKatmani.addTo(map);
-                alert("🚨 " + data.length + " adet aktif yangın/termal odak tespit edildi!");
+                alert("🔥 NASA FIRMS uydusuna göre " + data.length + " adet aktif termal odak tespit edildi.");
             } else {
-                alert("✅ Şu an için Türkiye genelinde aktif yangın bulunamadı.");
+                alert("🛰️ NASA FIRMS uydu verisine göre şu an görüntülenecek aktif termal odak bulunamadı. Bu, Türkiye'de aktif yangın olmadığı anlamına gelmez. Resmî ekiplerin müdahale ettiği yangınlar uydu verisinde her zaman anlık görünmeyebilir.");
             }
     };
     xhr.onerror = function() {
@@ -633,16 +633,7 @@ function canliYanginKontrol() {
 
 
 
-<script>
-window.addEventListener("load", function(){
-    var y = document.getElementById("yanginBtn");
-    if(y){
-        y.addEventListener("click", function(){
-            canliYanginKontrol();
-        });
-    }
-});
-</script>
+
 
 </body>
 </html>

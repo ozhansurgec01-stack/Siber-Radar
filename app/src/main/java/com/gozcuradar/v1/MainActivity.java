@@ -52,8 +52,15 @@ public class MainActivity extends AppCompatActivity {
         ayar.setAllowContentAccess(true);
         ayar.setCacheMode(WebSettings.LOAD_NO_CACHE);
         ayar.setMediaPlaybackRequiresUserGesture(false);
+        ayar.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
-        web.setWebViewClient(new WebViewClient() {
+        web.setWebChromeClient(new android.webkit.WebChromeClient());
+
+web.setWebViewClient(new WebViewClient() {
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        android.util.Log.e("WEBVIEW_HATA", errorCode + " " + description + " " + failingUrl);
+    }
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
@@ -67,12 +74,11 @@ public class MainActivity extends AppCompatActivity {
         web.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
 
         yenile.setOnClickListener(v -> {
-            web.clearCache(false);
             web.reload();
         });
 
-        web.clearCache(true);
         web.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        web.clearCache(true);
         web.loadUrl("https://siber-radar-1.onrender.com/");
     }
 

@@ -592,10 +592,7 @@ def yangin_alarm():
         if res.status_code == 200 and len(res.text) > 50:
             df = pd.read_csv(io.StringIO(res.text))
 
-            df = df[
-                (df["frp"] >= 15.0) &
-                (df["bright_ti4"] >= 325.0)
-            ]
+            # Test için filtre kaldırıldı
 
             return jsonify([
                 {
