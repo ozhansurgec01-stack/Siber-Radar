@@ -590,10 +590,14 @@ fetch('/api/heatmap')
 <script>
 var yanginKatmani = null;
 
-function canliYanginKontrol() { 
-    if (!yanginKatmani) { yanginKatmani = L.layerGroup(); }
+function canliYanginKontrol() {
+    if (!yanginKatmani) {
+        yanginKatmani = L.layerGroup();
+    }
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", window.location.origin + "/api/yanginin", true);
+
     xhr.onload = function() {
         if (xhr.status !== 200) {
             alert("⚠️ Yangın servisi yanıt vermedi.");
@@ -601,31 +605,24 @@ function canliYanginKontrol() {
         }
 
         var data = JSON.parse(xhr.responseText);
-
         yanginKatmani.clearLayers();
-            
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(y => {
-                    var marker = L.circleMarker([y.lat, y.lng], {
-                        radius: 8,
-                        color: "#ff0000",
-                        fillColor: "#ff4500",
-                        fillOpacity: 0.9
-                    });
-                    
-                    marker.bindPopup("<b>🔥 Aktif Termal Anomali</b><br>Sıcaklık: " + y.parlaklik + " K<br>Güç (FRP): " + y.frp + " MW");
-                    yanginKatmani.addLayer(marker);
-                });
-                
-                yanginKatmani.addTo(map);
-                alert("🔥 NASA FIRMS uydusuna göre " + data.length + " adet aktif termal odak tespit edildi.");
-            } else {
-                alert("🛰️ NASA FIRMS uydu verisine göre şu an görüntülenecek aktif termal odak bulunamadı. Bu, Türkiye'de aktif yangın olmadığı anlamına gelmez. Resmî ekiplerin müdahale ettiği yangınlar uydu verisinde her zaman anlık görünmeyebilir.");
-            }
+
+        if (Array.isArray(data) && data.length > 0) {
+
+            let mesaj = "🔥 Aktif yangın bölgeleri:\n\n";
+
+            data.forEach(y => {
+                mesaj += "📍 " + y.lat.toFixed(3) + ", " + y.lng.toFixed(3);
+                mesaj += "\n🔥 FRP: " + y.frp + " MW\n\n";
+            });
+
+            alert(mesaj);
+
+        } else {
+            alert("🛰️ Türkiye'de aktif uydu yangın noktası bulunamadı.");
+        }
     };
-    xhr.onerror = function() {
-        alert("⚠️ Yangın verisi alınırken hata oluştu.");
-    };
+
     xhr.send();
 }
 </script>
