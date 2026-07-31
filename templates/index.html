@@ -612,7 +612,7 @@ function canliYanginKontrol() {
             let mesaj = "🔥 Aktif yangın bölgeleri:\n\n";
 
             data.forEach(y => {
-                mesaj += "📍 " + y.lat.toFixed(3) + ", " + y.lng.toFixed(3);
+                mesaj += "📍 " + (y.il || "Bilinmeyen bölge");
                 mesaj += "\n🔥 FRP: " + y.frp + " MW\n\n";
             });
 
