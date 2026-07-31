@@ -600,6 +600,7 @@ def yangin_alarm():
         rows = csv.DictReader(io.StringIO(res.text))
 
         yanginlar = []
+        # Render rebuild test
 
         for row in rows:
             lat = float(row["latitude"])
@@ -623,6 +624,7 @@ def yangin_alarm():
                 il = isim
                 break
 
+        print("BULUNAN IL:", il, lat, lng)
         if il != "Bilinmeyen":
             yanginlar.append({
                 "aktif": True,
