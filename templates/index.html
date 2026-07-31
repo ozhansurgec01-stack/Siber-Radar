@@ -558,7 +558,12 @@ function firtinaGoster(){
             });
         }
 
-        L.popup({maxWidth:220, autoPan:false})
+        L.popup({
+            maxWidth:260,
+            autoPan:true,
+            keepInView:true,
+            autoPanPadding:[20,80]
+        })
         .setLatLng(map.getCenter())
         .setContent(icerik)
         .openOn(map);

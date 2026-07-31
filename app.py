@@ -294,17 +294,18 @@ def storm():
                 sicaklik=round(d.get("main",{}).get("temp",0))
 
                 if ruzgar >= 60:
-                    durum="Fırtına uyarısı"
-                elif ruzgar >= 30:
-                    durum="Fırtına riski"
+                    durum="🌪️ Fırtına uyarısı"
+                elif ruzgar >= 40:
+                    durum="⚠️ Fırtına riski"
                 else:
-                    durum="Normal"
+                    continue
 
                 sonuc.append({
                     "isim":s["isim"],
                     "ruzgar":ruzgar,
                     "sicaklik":sicaklik,
-                    "durum":durum
+                    "durum":durum,
+                    "kontrol": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 })
             except Exception as e:
                 pass # hata: print(e)
@@ -317,13 +318,6 @@ def storm():
 def api_get_visits_fix():
     return jsonify([])
 
-@app.context_processor
-def inject_kameralar():
-    kameralar_listesi = [
-        ["Adana Sismik İstasyonu", 37.0, 35.3, "", "radar"],
-        ["İstanbul Boğaz Kamerası", 41.0, 29.0, "https://www.youtube.com/embed/live_stream?channel=UC...", "yt"]
-    ]
-    return dict(kameralar=kameralar_listesi)
 
 
 
@@ -549,6 +543,21 @@ def online_sayisi():
 
     except Exception:
         return {"online": 0, "konum": ""}
+
+
+
+@app.route('/api/polen')
+def polen():
+    return jsonify({
+        "durum":"Veri hazırlanıyor",
+        "kaynak":"OpenWeather",
+        "veri":[]
+    })
+
+
+@app.route('/api/heatmap')
+def heatmap():
+    return jsonify([])
 
 
 if __name__ == "__main__":
