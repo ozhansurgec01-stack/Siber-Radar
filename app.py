@@ -186,6 +186,20 @@ def weather():
                 feels = round(c["heatindex_c"])
                 humidity = c["humidity"]
 
+                wind = round(c.get("wind_kph", 0))
+                wind_alarm = None
+
+                if wind >= 60:
+                    wind_alarm = "firtina"
+                elif wind >= 40:
+                    wind_alarm = "kuvvetli"
+
+                fire_risk = "dusuk"
+                if temp >= 35 and humidity <= 30 and wind >= 30:
+                    fire_risk = "yuksek"
+                elif temp >= 30 and humidity <= 40:
+                    fire_risk = "orta"
+
                 alarm = None
                 if temp >= 38 or feels >= 38:
                     alarm = "sicak"
@@ -199,6 +213,9 @@ def weather():
                     "anlik": temp,
                     "hissedilen": feels,
                     "nem": humidity,
+                    "wind": wind,
+                    "wind_alarm": wind_alarm,
+                    "fire_risk": fire_risk,
                     "panel": s["panel"],
                     "alarm": alarm
                 })
