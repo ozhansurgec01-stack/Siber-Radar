@@ -5,7 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Siber Afet Radarı v18.7</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
+</script>
     <style>
         :root {
 .leaflet-popup-content{max-width:220px!important;width:220px!important;font-size:13px!important}.leaflet-popup-content-wrapper{border-radius:12px!important}.leaflet-popup{margin-bottom:10px!important}
@@ -177,7 +197,27 @@ body > div:first-of-type {
 }
 
 </style>
-<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js">
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
+</script>
 <body>
 <div style="min-height:42px;display:flex;align-items:center;padding:10px 15px;color:#00eaff;font-weight:bold;font-size:15px;flex-wrap:wrap;">
 <span style="display:inline-block;width:16px;height:16px;border-radius:5px;background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd4);color:white;text-align:center;line-height:16px;font-size:11px;">◎</span>
@@ -539,7 +579,27 @@ body > div:first-of-type {
         }
 
         meteoRiskGuncelle();
-    </script>
+    
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
+</script>
 
     <script>
         async function canliYagisKontrol(){
@@ -567,11 +627,51 @@ body > div:first-of-type {
             setTimeout(() => box.remove(), 10000);
             if(btn) btn.innerHTML = "🌧️ CANLI YAĞIŞ";
         }
-    </script>
+    
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
+</script>
 <script>
 window.addEventListener('load', function(){
 
 });
+
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
 </script>
 <script>
 setTimeout(function(){
@@ -583,6 +683,26 @@ fetch('/api/heatmap')
  }
 });
 },2000);
+
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
 </script>
 
 
@@ -625,6 +745,26 @@ function canliYanginKontrol() {
 
     xhr.send();
 }
+
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
 </script>
 
 
@@ -666,6 +806,26 @@ function showPopup(text){
 function closePopup(){
  document.getElementById("popup").style.display="none";
 }
+
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
 </script>
 </body>
 </html>
@@ -678,6 +838,26 @@ fetch('/api/polen')
     console.log("Polen verisi:", data);
     window.polenVerisi=data;
 });
+
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
 </script>
 
 <script>
@@ -696,6 +876,26 @@ t+="🤧 Risk: "+x.alerji+"\n\n";
 alert(t);
 });
 }
+
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
 </script>
 
 
@@ -744,6 +944,26 @@ function firtinaGoster(){
         },10000);
     });
 }
+
+async function resmiYanginGetir(){
+    fetch("/api/resmi_yangin")
+    .then(r=>r.json())
+    .then(data=>{
+        let box=document.getElementById("resmiYanginBox");
+        if(!box) return;
+
+        if(data.aktif && data.aktif.length>0){
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>";
+            data.aktif.forEach(y=>{
+                box.innerHTML += "📍 "+y.il+"<br>";
+            });
+        }else{
+            box.innerHTML="🔥 Resmi aktif yangınlar<br><br>Veri bekleniyor...";
+        }
+    });
+}
+
+resmiYanginGetir();
 </script>
 
 <style>
