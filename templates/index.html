@@ -414,7 +414,7 @@ body > div:first-of-type {
                     0.8:"#ff8800",
                     1:"#ff0000"
                 }
-            }).addTo(map); console.log("ISI AKTIF",noktalar); console.log("HEAT LAYER OK"); alert("ISI NOKTA: "+noktalar.length);
+            }).addTo(map); console.log("ISI AKTIF",noktalar); console.log("HEAT LAYER OK"); 
         }
 
             document.getElementById('cam-title').innerText = "🎥 " + isim;
@@ -616,10 +616,10 @@ function canliYanginKontrol() {
                 mesaj += "\n🔥 FRP: " + y.frp + " MW\n\n";
             });
 
-            alert(mesaj);
+            showPopup(mesaj);
 
         } else {
-            alert("🛰️ Türkiye'de aktif uydu yangın noktası bulunamadı.");
+            showPopup("🛰️ Türkiye&#39;de aktif uydu yangın noktası bulunamadı.");
         }
     };
 
@@ -632,6 +632,41 @@ function canliYanginKontrol() {
 
 
 
+
+<div id="popup" style="
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:#111827;
+color:white;
+padding:25px;
+border-radius:18px;
+box-shadow:0 0 30px #000;
+z-index:9999;
+max-width:320px;
+text-align:center;
+font-size:16px;">
+<div id="popupText"></div>
+<button onclick="closePopup()" style="
+margin-top:20px;
+padding:10px 25px;
+border:0;
+border-radius:12px;
+background:#ef4444;
+color:white;">Tamam</button>
+</div>
+
+<script>
+function showPopup(text){
+ document.getElementById("popupText").innerText=text;
+ document.getElementById("popup").style.display="block";
+}
+function closePopup(){
+ document.getElementById("popup").style.display="none";
+}
+</script>
 </body>
 </html>
 
