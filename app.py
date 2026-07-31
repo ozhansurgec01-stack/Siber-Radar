@@ -647,7 +647,19 @@ if __name__ == "__main__":
 
 @app.route("/api/resmi_yangin")
 def resmi_yangin():
-    return jsonify({
-        "kaynak": "Tarım ve Orman Bakanlığı",
-        "aktif": []
-    })
+    try:
+        # Tarım ve Orman / OGM resmi yangın verisi
+        # Veri kaynağı eklendiğinde burası güncellenecek
+        aktif_yanginlar = [
+        ]
+
+        return jsonify({
+            "kaynak": "Tarım ve Orman Bakanlığı - OGM",
+            "aktif": aktif_yanginlar,
+            "sayisi": len(aktif_yanginlar)
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        }),500
