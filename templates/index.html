@@ -216,13 +216,13 @@ body > div:first-of-type {
         
         
         <div id="map"></div>
-<div id="miniRisk" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index:9999; width:230px; background:#080d18; border:1px solid #00e5ff; border-radius:10px; padding:10px; color:white; font-size:10px; display:none; justify-content:space-around;">
+<div id="miniRisk" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index:9999; width:320px; background:#080d18; border:1px solid #00e5ff; border-radius:10px; padding:14px; color:white; font-size:10px; display:none; justify-content:space-around;">
         <span style="color:#4285f4;text-align:center">🔵 <span id="riskLow">0%</span><br><small>Düşük Risk</small></span>
         <span style="color:#22c55e;text-align:center">🟢 <span id="riskMid">0%</span><br><small>Orta Risk</small></span>
         <span style="color:#ef4444;text-align:center">🔴 <span id="riskHigh">0%</span><br><small>Yüksek Risk</small></span>
 
         <div id="meteoRiskArea" style="width:100%; margin-top:10px; border-top:1px solid #334155; padding-top:8px; text-align:center;">
-            <b style="color:#38bdf8;">🌦️ HAVA UYARISI (MGM)</b><br>
+            <b style="color:#38bdf8;">🌦️ HAVA UYARISI (MGM)</b><br><span id="meteoCity">📍 --</span><br>
             <span id="meteoWind">🌪️ Rüzgar: --</span><br>
             <span id="meteoFire">🔥 Yangın: --</span><br>
             <span id="meteoTemp">🌡️ Sıcaklık: --</span>
@@ -513,6 +513,7 @@ body > div:first-of-type {
             let wind = document.getElementById("meteoWind");
             let fire = document.getElementById("meteoFire");
             let temp = document.getElementById("meteoTemp");
+            let city = document.getElementById("meteoCity");
 
             fetch('/api/weather')
             .then(r => r.json())
@@ -520,6 +521,7 @@ body > div:first-of-type {
                 if (!d || !d.length) return;
 
                 let sehir = d.find(x => x.isim === "ADANA") || d[0];
+                if (city) city.innerHTML = "📍 " + sehir.isim;
 
                 let ruzgar = sehir.wind_alarm || "normal";
                 let yangin = sehir.fire_risk || "dusuk";
