@@ -607,8 +607,24 @@ def yangin_alarm():
 
             # Türkiye yaklaşık sınır filtresi
             if 35.5 <= lat <= 42.2 and 25.5 <= lng <= 45.0:
-                yanginlar.append({
+                iller = [
+            ("Balıkesir", 39.65, 27.88),
+            ("İzmir", 38.42, 27.14),
+            ("Muğla", 37.21, 28.36),
+            ("Antalya", 36.89, 30.70),
+            ("Çanakkale", 40.15, 26.40)
+        ]
+
+        il = "Türkiye"
+
+        for isim, ilat, ilng in iller:
+            if abs(lat-ilat) < 1.5 and abs(lng-ilng) < 1.5:
+                il = isim
+                break
+
+        yanginlar.append({
                     "aktif": True,
+                    "il": il,
                     "lat": lat,
                     "lng": lng,
                     "frp": float(row["frp"])
