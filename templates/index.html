@@ -590,7 +590,7 @@ fetch('/api/heatmap')
 <script>
 var yanginKatmani = L.layerGroup();
 
-function canliYanginKontrol() { 
+window.canliYanginKontrol = function() { 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/api/yanginin", true);
     xhr.onload = function() {
