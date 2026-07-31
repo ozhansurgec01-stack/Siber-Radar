@@ -599,15 +599,22 @@ def yangin_alarm():
 
         rows = csv.DictReader(io.StringIO(res.text))
 
-        return jsonify([
-            {
-                "aktif": True,
-                "lat": float(row["latitude"]),
-                "lng": float(row["longitude"]),
-                "frp": float(row["frp"])
-            }
-            for row in rows
-        ])
+        yanginlar = []
+
+        for row in rows:
+            lat = float(row["latitude"])
+            lng = float(row["longitude"])
+
+            # Türkiye yaklaşık sınır filtresi
+            if 35.5 <= lat <= 42.2 and 25.5 <= lng <= 45.0:
+                yanginlar.append({
+                    "aktif": True,
+                    "lat": lat,
+                    "lng": lng,
+                    "frp": float(row["frp"])
+                })
+
+        return jsonify(yanginlar)
 
     except Exception as e:
         import traceback
