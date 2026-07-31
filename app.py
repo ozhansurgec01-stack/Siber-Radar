@@ -604,6 +604,7 @@ def yangin_alarm():
         for row in rows:
             lat = float(row["latitude"])
             lng = float(row["longitude"])
+            print("NASA NOKTA:", lat, lng)
 
             # Türkiye yaklaşık sınır filtresi
             if 35.8 <= lat <= 42.1 and 26.0 <= lng <= 44.8:
