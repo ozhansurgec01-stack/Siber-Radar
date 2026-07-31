@@ -593,17 +593,14 @@ var yanginKatmani = null;
 function canliYanginKontrol() { 
     if (!yanginKatmani) { yanginKatmani = L.layerGroup(); }
     var xhr = new XMLHttpRequest();
-    alert("CANLI YANGIN FONKSİYONU ÇALIŞTI");
     xhr.open("GET", "/api/yanginin", true);
     xhr.onload = function() {
-        alert("API cevap kodu: " + xhr.status);
         if (xhr.status !== 200) {
             alert("⚠️ Yangın servisi yanıt vermedi.");
             return;
         }
 
         var data = JSON.parse(xhr.responseText);
-        alert("JSON GELDI: " + xhr.responseText);
 
         yanginKatmani.clearLayers();
             
