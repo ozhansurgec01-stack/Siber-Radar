@@ -583,7 +583,6 @@ def heatmap():
 @app.route("/api/yanginin")
 def yangin_alarm():
     try:
-        import pandas as pd
         import io, requests
 
         url = "https://firms.modaps.eosdis.nasa.gov/api/area/csv/763d612c3fd36fdca0ce4239ebac5263/VIIRS_SNPP_NRT/24,34,46,43/1"
@@ -596,7 +595,9 @@ def yangin_alarm():
                 "status": res.status_code
             }), 500
 
-        df = pd.read_csv(io.StringIO(res.text))
+        import csv
+
+        rows = csv.DictReader(io.StringIO(res.text))
 
         return jsonify([
             {
@@ -605,7 +606,7 @@ def yangin_alarm():
                 "lng": float(row["longitude"]),
                 "frp": float(row["frp"])
             }
-            for _, row in df.iterrows()
+            for row in rows
         ])
 
     except Exception as e:
