@@ -610,7 +610,7 @@ def yangin_alarm():
     except Exception as e:
         print("Yangın hata:", e)
 
-    return jsonify({"hata":"Yangin API erisimi yok"})
+    return jsonify([])
 
 
 if __name__ == "__main__":
