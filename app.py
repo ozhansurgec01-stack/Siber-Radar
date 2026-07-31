@@ -622,13 +622,12 @@ def yangin_alarm():
                 il = isim
                 break
 
-        yanginlar.append({
-                    "aktif": True,
-                    "il": il,
-                    "lat": lat,
-                    "lng": lng,
-                    "frp": float(row["frp"])
-                })
+        if il != "Türkiye":
+            yanginlar.append({
+                "aktif": True,
+                "il": il,
+                "frp": float(row["frp"])
+            })
 
         return jsonify(yanginlar)
 
