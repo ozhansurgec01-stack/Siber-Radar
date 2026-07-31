@@ -51,12 +51,16 @@ public class MainActivity extends AppCompatActivity {
         ayar.setMediaPlaybackRequiresUserGesture(false);
 
         web.setWebViewClient(new WebViewClient());
+        web.setWebContentsDebuggingEnabled(true);
+        web.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
 
         yenile.setOnClickListener(v -> {
             web.clearCache(false);
             web.reload();
         });
 
+        web.clearCache(true);
+        web.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         web.loadUrl("https://siber-radar.onrender.com/");
     }
 
