@@ -583,7 +583,7 @@ def heatmap():
 @app.route("/api/yanginin")
 def yangin_alarm():
     try:
-        url = "https://firms.modaps.eosdis.nasa.gov/api/country/csv/c4244b41a54ee3dbba5306660fb1e149/VIIRS_SNPP_NRT/TUR/1"
+        url = "https://firms.modaps.eosdis.nasa.gov/api/area/csv/763d612c3fd36fdca0ce4239ebac5263/VIIRS_SNPP_NRT/25,35,45,43/1"
         import pandas as pd
         import io, requests
 
@@ -610,7 +610,7 @@ def yangin_alarm():
     except Exception as e:
         print("Yangın hata:", e)
 
-    return jsonify([])
+    return jsonify({"hata":"Yangin API erisimi yok"})
 
 
 if __name__ == "__main__":
