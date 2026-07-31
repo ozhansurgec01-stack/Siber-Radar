@@ -587,10 +587,17 @@ fetch('/api/heatmap')
 var yanginKatmani = L.layerGroup();
 
 function canliYanginKontrol() {
-    fetch("/api/yanginin")
-        .then(r => r.json())
-        .then(data => {
-            yanginKatmani.clearLayers();
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/api/yanginin", true);
+    xhr.onload = function() {
+        if (xhr.status !== 200) {
+            alert("⚠️ Yangın servisi yanıt vermedi.");
+            return;
+        }
+
+        var data = JSON.parse(xhr.responseText);
+
+        yanginKatmani.clearLayers();
             
             if (Array.isArray(data) && data.length > 0) {
                 data.forEach(y => {
@@ -610,10 +617,11 @@ function canliYanginKontrol() {
             } else {
                 alert("✅ Şu an için Türkiye genelinde aktif yangın bulunamadı.");
             }
-        })
-        .catch(err => {
-            alert("⚠️ Yangın verisi alınırken hata oluştu.");
-        });
+    };
+    xhr.onerror = function() {
+        alert("⚠️ Yangın verisi alınırken hata oluştu.");
+    };
+    xhr.send();
 }
 </script>
 
