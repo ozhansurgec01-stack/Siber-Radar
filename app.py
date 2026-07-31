@@ -157,7 +157,7 @@ def api_status():
 
     except Exception as e:
         print("Deprem hata:", e)
-        return jsonify([])
+        return jsonify({"error": repr(e)})
 
 @app.route('/api/weather')
 def weather():
