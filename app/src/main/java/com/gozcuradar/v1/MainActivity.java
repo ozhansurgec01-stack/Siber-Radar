@@ -10,6 +10,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
         FrameLayout ana = new FrameLayout(this);
 
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
                         Gravity.TOP | Gravity.LEFT
                 );
 
-        buton.setMargins(180, 90, 0, 0);
+        buton.setMargins(20, 120, 0, 0);
         ana.addView(yenile, buton);
 
         setContentView(ana);

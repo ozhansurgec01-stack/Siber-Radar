@@ -47,24 +47,28 @@
             justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
         }
         .brand-title { font-weight: bold; font-family: monospace; font-size: 13px; letter-spacing: 1px; text-shadow: var(--neon-glow); }
-        .nav-buttons{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:5px;
-padding:4px;
-width:100%;
-box-sizing:border-box;
+        
+.nav-buttons { display:flex; gap:5px; flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start; }
+
+        
+.toggle-btn{
+background:transparent;
+color:var(--text-color);
+border:2px solid #00eaff;
+border-radius:6px;
+padding:6px 4px;
+font-size:10px;
+font-weight:bold;
+font-family:monospace;
+box-shadow:0 0 8px #00eaff;
+min-height:42px;
 }
-        .toggle-btn {
-            background: transparent; color: var(--text-color); border: var(--border-style);
-            padding:6px 4px; border-radius: 4px; cursor: pointer; font-weight: bold;
-            font-size:10px; font-family: monospace; box-shadow: var(--neon-glow);
-        }
+
         .toggle-btn.active-risik { background: #ff4500; color: #fff; border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
         .toggle-btn.active-mgm { background: #eab308; color: #000; border-color: #eab308; box-shadow: 0 0 10px #eab308; }
         .toggle-btn.active-cam { background: #00ecff; color: #000; border-color: #00ecff; box-shadow: 0 0 10px #00ecff; }
         .toggle-btn.active-lightning { background: #facc15; color: #000; border-color: #facc15; box-shadow: 0 0 10px #facc15; }
-        .map-container { position: relative; height: 45vh; width: 100%; flex-shrink: 0; }
+        .map-container { position: relative; height: 38vh; width: 100%; flex-shrink: 0; }
         #map { height: 100%; width: 100%; background-color: #030712 !important; }
         #mgm-banner, #cam-list-banner {
             position: absolute; top: 10px; left: 10px; right: 10px; z-index: 999;
@@ -155,7 +159,7 @@ body > div:first-of-type {
 <body>
 <div style="min-height:42px;display:flex;align-items:center;padding:10px 15px;color:#00eaff;font-weight:bold;font-size:15px;flex-wrap:wrap;">
 <span style="display:inline-block;width:16px;height:16px;border-radius:5px;background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd4);color:white;text-align:center;line-height:16px;font-size:11px;">◎</span>
-<a href="https://instagram.com/totik.01" target="_blank" style="color:#facc15;text-decoration:none;">◎ @totik.01</a>&nbsp;&nbsp; 👥 {{ toplam_ziyaret }} &nbsp; 🟢 ONLINE: {{ online }}<button class="toggle-btn" id="modeBtn" onclick="toggleMod()" style="margin-left:auto;">KLASİK</button>
+<a href="https://instagram.com/totik.01" target="_blank" style="color:#facc15;text-decoration:none;">◎ @totik.01</a>&nbsp;&nbsp; 👥 {{ toplam_ziyaret }} &nbsp; 🟢 ONLINE: {{ online }}
 </div>
 
 
@@ -169,6 +173,7 @@ body > div:first-of-type {
             <button class="toggle-btn" id="meteoBtn" onclick="toggleRadarLayer('meteo')">☔ YAĞIŞ</button>
             <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
 <button class="toggle-btn" id="stormBtn" onclick="firtinaGoster()">🌪️ FIRTINA</button>
+<button class="toggle-btn" id="modeBtn2" onclick="toggleMod()">🎨 KLASİK</button>
             
         </div>
     </div>
@@ -237,7 +242,7 @@ body > div:first-of-type {
 
         function toggleMod() {
             var body = document.body;
-            var btn = document.getElementById('modeBtn');
+            var btn = document.getElementById('modeBtn2');
             if (body.classList.contains('light-mode')) {
                 body.classList.remove('light-mode');
                 btn.innerText = "KLASİK";
@@ -446,8 +451,19 @@ body > div:first-of-type {
 
         function riskGoster() {
             let r = document.getElementById("miniRisk");
-            r.style.display = (r.style.display === "none" || r.style.display === "") ? "flex" : "none";
-            if(r.style.display === "flex") miniRiskGuncelle();
+            r.style.display = "flex";
+            r.style.position = "relative";
+            r.style.top = "auto";
+            r.style.left = "auto";
+            r.style.margin = "10px auto";
+            r.style.zIndex = "5";
+
+            miniRiskGuncelle();
+
+            clearTimeout(window.riskKapat);
+            window.riskKapat = setTimeout(() => {
+                r.style.display = "none";
+            }, 8000);
         }
         function miniRiskGuncelle() {
             fetch('/api/risk').then(r => r.json()).then(d => {
@@ -581,3 +597,20 @@ function firtinaGoster(){
     });
 }
 </script>
+
+<style>
+.risk-box, .risk-panel {
+    position: relative !important;
+    z-index: 5;
+    margin: 10px auto !important;
+    width: 90% !important;
+}
+
+.map-container {
+    margin-top: 0 !important;
+}
+
+.weather-bar {
+    position: relative !important;
+}
+</style>
