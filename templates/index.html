@@ -196,7 +196,7 @@ body > div:first-of-type {
             <button class="toggle-btn" id="liveRainBtn" onclick="canliYagisKontrol()">🌧️ CANLI YAĞIŞ</button>
 <button class="toggle-btn" id="stormBtn" onclick="firtinaGoster()">🌪️ FIRTINA</button>
 
-<button class="toggle-btn" id="yanginBtn" onclick="canliYanginKontrol()">🔥 CANLI YANGIN</button>
+<button class="toggle-btn" id="yanginBtn">🔥 CANLI YANGIN</button>
 <button class="toggle-btn" id="modeBtn2" onclick="toggleMod()">🎨 KLASİK</button>
             
         </div>
@@ -630,6 +630,18 @@ window.canliYanginKontrol = function() {
 </script>
 
 
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    var y = document.getElementById("yanginBtn");
+    if(y){
+        y.addEventListener("click", function(){
+            window.canliYanginKontrol();
+        });
+    }
+});
+</script>
 
 </body>
 </html>
