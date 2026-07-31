@@ -586,7 +586,7 @@ fetch('/api/heatmap')
 <script>
 var yanginKatmani = L.layerGroup();
 
-function canliYanginKontrol() {
+function canliYanginKontrol() { alert('BUTON CALISTI');
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/api/yanginin", true);
     xhr.onload = function() {
