@@ -47,11 +47,18 @@
             justify-content: space-between; align-items: center; z-index: 1000; flex-shrink: 0;
         }
         .brand-title { font-weight: bold; font-family: monospace; font-size: 13px; letter-spacing: 1px; text-shadow: var(--neon-glow); }
-        .nav-buttons { display: flex; gap: 4px; flex-wrap: nowrap; justify-content: flex-start; overflow-x:auto; }
+        .nav-buttons{
+display:grid;
+grid-template-columns:repeat(4,minmax(0,1fr));
+gap:8px;
+padding:8px;
+width:100%;
+box-sizing:border-box;
+}
         .toggle-btn {
             background: transparent; color: var(--text-color); border: var(--border-style);
-            padding: 5px 7px; border-radius: 4px; cursor: pointer; font-weight: bold;
-            font-size: 10px; font-family: monospace; box-shadow: var(--neon-glow);
+            padding:10px 6px; border-radius: 4px; cursor: pointer; font-weight: bold;
+            font-size:12px; font-family: monospace; box-shadow: var(--neon-glow);
         }
         .toggle-btn.active-risik { background: #ff4500; color: #fff; border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
         .toggle-btn.active-mgm { background: #eab308; color: #000; border-color: #eab308; box-shadow: 0 0 10px #eab308; }
@@ -69,7 +76,7 @@
             font-weight: bold; font-size: 11px; display: flex; justify-content: space-between;
             align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; margin-bottom: 6px;
         }
-        .mgm-list, .cam-dropdown-list { font-size: 10px; max-height: 130px; overflow-y: auto; line-height: 1.4; }
+        .mgm-list, .cam-dropdown-list { font-size:12px; max-height: 130px; overflow-y: auto; line-height: 1.4; }
         .mgm-day, .cam-dropdown-item {
             margin-bottom: 4px; background: rgba(255,255,255,0.05); padding: 5px 8px;
             border-radius: 3px; display: flex; justify-content: space-between; align-items: center;
@@ -146,9 +153,9 @@ body > div:first-of-type {
 </style>
 <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 <body>
-<div style="height:35px;display:flex;align-items:center;padding-left:25px;padding-right:15px;color:#00eaff;font-weight:bold;font-size:14px;">
+<div style="min-height:55px;display:flex;align-items:center;padding:10px 15px;color:#00eaff;font-weight:bold;font-size:18px;flex-wrap:wrap;">
 <span style="display:inline-block;width:16px;height:16px;border-radius:5px;background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd4);color:white;text-align:center;line-height:16px;font-size:11px;">◎</span>
-<a href="https://instagram.com/totik.01" target="_blank" style="color:#facc15;text-decoration:none;">◎ @totik.01</a>&nbsp;&nbsp; 👥 {{ toplam_ziyaret }} &nbsp; 🟢 {{ online }}<button class="toggle-btn" id="modeBtn" onclick="toggleMod()" style="margin-left:auto;">KLASİK</button>
+<a href="https://instagram.com/totik.01" target="_blank" style="color:#facc15;text-decoration:none;">◎ @totik.01</a>&nbsp;&nbsp; 👥 {{ toplam_ziyaret }} &nbsp; 🟢 ONLINE: {{ online }}<button class="toggle-btn" id="modeBtn" onclick="toggleMod()" style="margin-left:auto;">KLASİK</button>
 </div>
 
 
