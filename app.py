@@ -615,10 +615,10 @@ def yangin_alarm():
             ("Çanakkale", 40.15, 26.40)
         ]
 
-        il = "Türkiye"
+        il = "Bilinmeyen"
 
         for isim, ilat, ilng in iller:
-            if abs(lat-ilat) < 1.5 and abs(lng-ilng) < 1.5:
+            if abs(lat-ilat) < 2.5 and abs(lng-ilng) < 2.5:
                 il = isim
                 break
 
