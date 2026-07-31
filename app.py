@@ -579,40 +579,38 @@ def heatmap():
 
 
 
-@app.route('/api/yanginin')
-@app.route('/api/yanginin')
+
+@app.route("/api/yanginin")
 def yangin_alarm():
     try:
-        FIRMS_KEY = "df249ee8cc2104dd8329b6aaf1fbe643"
+        url = "https://firms.modaps.eosdis.nasa.gov/api/country/csv/c4244b41a54ee3dbba5306660fb1e149/VIIRS_SNPP_NRT/TUR/1"
+        import pandas as pd
+        import io, requests
 
-        if FIRMS_KEY == "BURAYA_FIRMS_KEY":
-            return jsonify([])
+        res = requests.get(url, timeout=5)
 
-        url = f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{FIRMS_KEY}/VIIRS_SNPP_NRT/25,35,45,43/1"
+        if res.status_code == 200 and len(res.text) > 50:
+            df = pd.read_csv(io.StringIO(res.text))
 
-        r = requests.get(url, timeout=10)
+            df = df[
+                (df["frp"] >= 15.0) &
+                (df["bright_ti4"] >= 325.0)
+            ]
 
-        yanginlar = []
-
-        satirlar = r.text.splitlines()
-
-        for satir in satirlar[1:]:
-            veri = satir.split(",")
-
-            if len(veri) > 12:
-                yanginlar.append({
+            return jsonify([
+                {
                     "aktif": True,
-                    "yer": "Uydu yangın tespiti",
-                    "lat": float(veri[0]),
-                    "lng": float(veri[1]),
-                    "guven": veri[9],
-                    "zaman": veri[5]+" "+veri[6]
-                })
+                    "lat": float(r.latitude),
+                    "lng": float(r.longitude),
+                    "frp": float(r.frp)
+                }
+                for _, r in df.iterrows()
+            ])
 
-        return jsonify(yanginlar)
+    except Exception as e:
+        print("Yangın hata:", e)
 
-    except Exception:
-        return jsonify([])
+    return jsonify([])
 
 
 if __name__ == "__main__":
