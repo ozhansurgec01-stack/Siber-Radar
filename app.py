@@ -608,7 +608,9 @@ def yangin_alarm():
             ])
 
     except Exception as e:
-        print("Yangın hata:", e)
+        import traceback
+        traceback.print_exc()
+        print("Yangın hata:", repr(e))
 
     return jsonify([])
 
