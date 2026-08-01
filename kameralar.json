@@ -1,23 +1,74 @@
 [
   {
     "id": 1,
-    "ad": "Playa de Troya - Tenerife",
-    "lat": 28.0567,
-    "lon": -16.7302,
-    "url": ""
+    "ad": "Canlı Yayın Kamerası 7",
+    "lat": 37.0,
+    "lon": 35.0,
+    "url": "https://www.youtube.com/embed/gFRtAAmiFbE?autoplay=1",
+    "tip": "yt"
   },
   {
     "id": 2,
-    "ad": "Istanbul Bogaz Kamera",
-    "lat": 41.043,
-    "lon": 29.034,
-    "url": ""
+    "ad": "Canlı Yayın Kamerası 6",
+    "lat": 37.0,
+    "lon": 35.0,
+    "url": "https://www.youtube.com/embed/DEycz2Ufv98?autoplay=1",
+    "tip": "yt"
   },
   {
     "id": 3,
-    "ad": "New York Times Square",
+    "ad": "Canlı Yayın Kamerası 5",
     "lat": 40.758,
     "lon": -73.9855,
-    "url": ""
+    "url": "https://www.youtube.com/embed/zfSst64NFcE?autoplay=1",
+    "tip": "yt"
+  },
+  {
+    "id": 4,
+    "ad": "Canlı Yayın Kamerası 4",
+    "lat": 37.0,
+    "lon": 35.3213,
+    "url": "https://www.youtube.com/embed/16hHfZzf8-I?autoplay=1",
+    "tip": "yt"
+  },
+  {
+    "id": 5,
+    "ad": "Canlı Yayın Kamerası 3",
+    "lat": 37.0,
+    "lon": 35.3213,
+    "url": "https://www.youtube.com/embed/EO_1LWqsCNE?autoplay=1",
+    "tip": "yt"
+  },
+  {
+    "id": 6,
+    "ad": "EarthCam Dublin Canlı Yayın",
+    "lat": 53.3498,
+    "lon": -6.2603,
+    "url": "https://www.youtube.com/embed/3nyPER2kzqk?autoplay=1",
+    "tip": "yt"
+  },
+  {
+    "id": 7,
+    "ad": "Times Square Canlı Yayın 2",
+    "lat": 40.758,
+    "lon": -73.9855,
+    "url": "https://www.youtube.com/embed/lM3khCaiDos?autoplay=1",
+    "tip": "yt"
+  },
+  {
+    "id": 8,
+    "ad": "YouTube Canlı Yayın Kamerası",
+    "lat": 38.7225,
+    "lon": 35.482,
+    "url": "https://www.youtube.com/embed/whIxfJ1IPoU?autoplay=1",
+    "tip": "yt"
+  },
+  {
+    "id": 9,
+    "ad": "Times Square Canlı Yayın Kamerası",
+    "lat": 40.758,
+    "lon": -73.9855,
+    "url": "https://www.youtube.com/embed/z-jYdOIKcTQ?autoplay=1",
+    "tip": "yt"
   }
 ]
