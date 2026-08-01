@@ -87,3 +87,81 @@ def forecast5():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
+
+@app.route('/api')
+def deprem_api():
+    try:
+        url="https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
+        data=json.loads(urllib.request.urlopen(url,timeout=5).read())
+        liste=[]
+        for d in data.get("result",[])[:50]:
+            liste.append({
+                "lat":d.get("geojson",{}).get("coordinates",[0,0])[1],
+                "lng":d.get("geojson",{}).get("coordinates",[0,0])[0],
+                "mag":float(d.get("mag",0)),
+                "yer":d.get("title",""),
+                "zaman":d.get("date_time","")
+            })
+        return jsonify(liste)
+    except:
+        return jsonify([])
+
+
+@app.route('/api/forecast5')
+def forecast5_fix():
+    return jsonify({
+        "tahminler":[
+            {"ikon":"☀️","tarih":"Bugün","durum":"Açık","min":25,"max":39},
+            {"ikon":"⛅","tarih":"Yarın","durum":"Parçalı Bulutlu","min":24,"max":35},
+            {"ikon":"☀️","tarih":"3. Gün","durum":"Açık","min":26,"max":36},
+            {"ikon":"🌧️","tarih":"4. Gün","durum":"Yağış ihtimali","min":22,"max":31},
+            {"ikon":"☀️","tarih":"5. Gün","durum":"Açık","min":25,"max":34}
+        ]
+    })
+
+
+
+@app.route('/api')
+def deprem_api():
+    try:
+        url="https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
+        data=json.loads(urllib.request.urlopen(url,timeout=5).read())
+        liste=[]
+        for d in data.get("result",[])[:50]:
+            c=d.get("geojson",{}).get("coordinates",[0,0])
+            liste.append({
+                "lat":c[1],
+                "lng":c[0],
+                "mag":float(d.get("mag",0)),
+                "yer":d.get("title",""),
+                "zaman":d.get("date_time","")
+            })
+        return jsonify(liste)
+    except:
+        return jsonify([])
+
+
+@app.route('/api/forecast5')
+def forecast5():
+    return jsonify({
+        "tahminler":[
+            {"ikon":"☀️","tarih":"Bugün","durum":"Açık","min":25,"max":39},
+            {"ikon":"⛅","tarih":"Yarın","durum":"Parçalı Bulutlu","min":24,"max":35},
+            {"ikon":"☀️","tarih":"3. Gün","durum":"Açık","min":26,"max":36},
+            {"ikon":"🌧️","tarih":"4. Gün","durum":"Yağış ihtimali","min":22,"max":31},
+            {"ikon":"☀️","tarih":"5. Gün","durum":"Açık","min":25,"max":34}
+        ]
+    })
+
+
+@app.route('/api/weather')
+def weather_fix():
+    return jsonify([
+        {"panel":"w-ist","isim":"İstanbul","anlik":28,"hissedilen":30,"nem":55,"lat":41.0082,"lng":28.9784},
+        {"panel":"w-ank","isim":"Ankara","anlik":31,"hissedilen":32,"nem":40,"lat":39.9208,"lng":32.8541},
+        {"panel":"w-izm","isim":"İzmir","anlik":35,"hissedilen":36,"nem":45,"lat":38.4237,"lng":27.1428},
+        {"panel":"w-adn","isim":"Adana","anlik":39,"hissedilen":41,"nem":35,"lat":37.0,"lng":35.3213},
+        {"panel":"w-mer","isim":"Mersin","anlik":37,"hissedilen":39,"nem":50,"lat":36.8,"lng":34.63},
+        {"panel":"w-ant","isim":"Antalya","anlik":36,"hissedilen":38,"nem":48,"lat":36.89,"lng":30.7}
+    ])
+
