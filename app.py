@@ -633,7 +633,9 @@ def yangin_alarm():
                     yanginlar.append({
                         "aktif":True,
                         "il":il,
-                        "frp":float(row.get("frp",0))
+                        "frp":float(row.get("frp",0)),
+                        "lat":lat,
+                        "lng":lng
                     })
 
         return jsonify({
