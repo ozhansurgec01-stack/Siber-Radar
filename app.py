@@ -102,6 +102,19 @@ SEHIRLER = [
 {"isim": "Erzurum", "lat": 39.9043, "lng": 41.2679, "query": "Erzurum", "panel": "w-erz"}
 ]
 
+
+
+ILLER = [
+    ("Balıkesir", 39.65, 27.88),
+    ("İzmir", 38.42, 27.14),
+    ("Muğla", 37.21, 28.36),
+    ("Antalya", 36.89, 30.70),
+    ("Çanakkale", 40.15, 26.40),
+    ("Aydın", 37.85, 27.84),
+    ("Denizli", 37.78, 29.09),
+    ("Manisa", 38.62, 27.43)
+]
+
 @app.route('/')
 def home():
     import json
@@ -583,63 +596,50 @@ def heatmap():
 @app.route("/api/yanginin")
 def yangin_alarm():
     try:
-        import io, requests
+        import io, csv, requests
 
         url = "https://firms.modaps.eosdis.nasa.gov/api/area/csv/763d612c3fd36fdca0ce4239ebac5263/VIIRS_SNPP_NRT/24,34,46,43/1"
 
         res = requests.get(url, timeout=10)
 
         if res.status_code != 200:
-            return jsonify({
-                "error": "NASA FIRMS bağlantı hatası",
-                "status": res.status_code
-            }), 500
-
-        import csv
+            return jsonify({"error":"NASA FIRMS bağlantı hatası"}),500
 
         rows = csv.DictReader(io.StringIO(res.text))
 
-        yanginlar = []
-        # Render rebuild test
+        yanginlar=[]
 
         for row in rows:
             try:
-                lat = float(row["latitude"])
-                lng = float(row["longitude"])
+                lat=float(row["latitude"])
+                lng=float(row["longitude"])
             except:
                 continue
-            print("NASA NOKTA:", lat, lng)
 
-            # Türkiye yaklaşık sınır filtresi
+            print("NASA NOKTA:",lat,lng)
+
             if 35.8 <= lat <= 42.1 and 26.0 <= lng <= 44.8:
 
+                il="Bilinmeyen"
 
-        il = "Bilinmeyen"
+                for isim,ilat,ilng in ILLER:
+                    if abs(lat-ilat)<2.5 and abs(lng-ilng)<2.5:
+                        il=isim
+                        break
 
-        for isim, ilat, ilng in iller:
-            if abs(lat-ilat) < 2.5 and abs(lng-ilng) < 2.5:
-                il = isim
-                break
+                print("BULUNAN IL:",il,lat,lng)
 
-        print("BULUNAN IL:", il, lat, lng)
-        if il != "Bilinmeyen":
-            yanginlar.append({
-                "aktif": True,
-                "il": il,
-                "frp": float(row["frp"])
-            })
+                if il!="Bilinmeyen":
+                    yanginlar.append({
+                        "aktif":True,
+                        "il":il,
+                        "frp":float(row.get("frp",0))
+                    })
 
         return jsonify(yanginlar)
 
     except Exception as e:
-        import traceback
-        return jsonify({
-            "error": repr(e),
-            "trace": traceback.format_exc()
-        }), 500
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+        return jsonify({"error":repr(e)}),500
 
 
 @app.route("/api/resmi_yangin")
@@ -660,3 +660,7 @@ def resmi_yangin():
         return jsonify({
             "error": str(e)
         }),500
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
