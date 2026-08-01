@@ -1,8 +1,22 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 import urllib.request
 import json
 
 app = Flask(__name__)
+
+import time
+online_users = {}
+
+@app.before_request
+def track_online():
+    ip = request.remote_addr
+    online_users[ip] = time.time()
+
+@app.route('/api/online')
+def online():
+    now = time.time()
+    aktif = [x for x,t in online_users.items() if now-t < 300]
+    return jsonify({"online": len(aktif)})
 
 @app.route('/')
 def index():
