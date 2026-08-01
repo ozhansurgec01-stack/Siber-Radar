@@ -671,3 +671,9 @@ def resmi_yangin():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
+
+@app.route('/kameralar.json')
+def kameralar_json():
+    with open("kameralar.json","r",encoding="utf-8") as f:
+        return jsonify(json.load(f))
