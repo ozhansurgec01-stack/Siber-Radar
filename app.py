@@ -612,13 +612,7 @@ def yangin_alarm():
 
             # Türkiye yaklaşık sınır filtresi
             if 35.8 <= lat <= 42.1 and 26.0 <= lng <= 44.8:
-                iller = [
-            ("Balıkesir", 39.65, 27.88),
-            ("İzmir", 38.42, 27.14),
-            ("Muğla", 37.21, 28.36),
-            ("Antalya", 36.89, 30.70),
-            ("Çanakkale", 40.15, 26.40)
-        ]
+
 
         il = "Bilinmeyen"
 
