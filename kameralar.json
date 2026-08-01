@@ -1,0 +1,23 @@
+[
+    {
+        "id":1,
+        "ad":"Playa de Troya - Tenerife",
+        "lat":28.0567,
+        "lon":-16.7302,
+        "url":""
+    },
+    {
+        "id":2,
+        "ad":"Istanbul Bogaz Kamera",
+        "lat":41.043,
+        "lon":29.034,
+        "url":""
+    },
+    {
+        "id":3,
+        "ad":"New York Times Square",
+        "lat":40.758,
+        "lon":-73.9855,
+        "url":""
+    }
+]
