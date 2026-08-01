@@ -603,8 +603,11 @@ def yangin_alarm():
         # Render rebuild test
 
         for row in rows:
-            lat = float(row["latitude"])
-            lng = float(row["longitude"])
+            try:
+                lat = float(row["latitude"])
+                lng = float(row["longitude"])
+            except:
+                continue
             print("NASA NOKTA:", lat, lng)
 
             # Türkiye yaklaşık sınır filtresi
