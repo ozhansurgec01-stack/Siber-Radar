@@ -636,7 +636,12 @@ def yangin_alarm():
                         "frp":float(row.get("frp",0))
                     })
 
-        return jsonify(yanginlar)
+        return jsonify({
+            "resmi": [],
+            "uydu": yanginlar,
+            "sayisi": len(yanginlar),
+            "mesaj": "NASA FIRMS uydu verisi"
+        })
 
     except Exception as e:
         return jsonify({"error":repr(e)}),500
