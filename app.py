@@ -110,11 +110,6 @@ def deprem_api():
     except Exception:
         return jsonify([])
 
-@app.route('/api/weather')
-def weather():
-    sicaklik = 39
-    alarm = "sicak" if sicaklik >= 38 else None
-    return jsonify({"durum":"aktif","sicaklik":sicaklik,"alarm":alarm,"hava":"Açık","kaynak":"Siber Radar"})
 
 @app.route('/api/risk')
 def risk():
@@ -133,24 +128,6 @@ def forecast5():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
-
-@app.route('/api')
-def deprem_api():
-    try:
-        url="https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
-        data=json.loads(urllib.request.urlopen(url,timeout=5).read())
-        liste=[]
-        for d in data.get("result",[])[:50]:
-            liste.append({
-                "lat":d.get("geojson",{}).get("coordinates",[0,0])[1],
-                "lng":d.get("geojson",{}).get("coordinates",[0,0])[0],
-                "mag":float(d.get("mag",0)),
-                "yer":d.get("title",""),
-                "zaman":d.get("date_time","")
-            })
-        return jsonify(liste)
-    except:
-        return jsonify([])
 
 
 @app.route('/api/forecast5')
