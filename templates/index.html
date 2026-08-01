@@ -242,7 +242,11 @@
             if (container.children.length > 0) return;
             container.innerHTML = '';
             kameralarVerisi.forEach(function(k) {
-                var [isim, lat, lng, link, type] = k;
+                var isim = k.ad;
+                var lat = k.lat;
+                var lng = k.lon;
+                var link = k.url;
+                var type = k.tip;
                 var ikon = type === 'radar' ? "📡" : (type === 'yt' ? "▶️" : "📷");
                 if (type === 'radar') {
                     container.innerHTML += `<div class="cam-dropdown-item" onclick="alert('Bu bir sismik istasyon verisidir, istasyon aktiftir.')"><span>${ikon} <b>${isim}</b></span><span style="color:#38bdf8;">[SİSMİK]</span></div>`;
