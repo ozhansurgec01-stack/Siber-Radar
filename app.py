@@ -95,7 +95,7 @@ def deprem_api():
             data=json.loads(r.read().decode())
 
         sonuc=[]
-        for d in data.get("result",[])[:50]:
+        for d in data.get("result",[])[:200]:
             sonuc.append({
                 "lat":float(d["geojson"]["coordinates"][1]),
                 "lng":float(d["geojson"]["coordinates"][0]),
