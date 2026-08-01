@@ -618,7 +618,7 @@ def yangin_alarm():
 
             print("NASA NOKTA:",lat,lng)
 
-            if 35.8 <= lat <= 42.1 and 26.0 <= lng <= 44.8:
+            if 35.8 <= lat <= 42.1 and 26.0 <= lng <= 44.8 and float(row.get("frp",0)) >= 5:
 
                 il="Bilinmeyen"
 
