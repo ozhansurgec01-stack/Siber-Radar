@@ -85,15 +85,13 @@ def forecast5():
     ]})
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
 
 @app.route('/api')
 def deprem_api():
     try:
         url="https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
         req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"})
-        with urllib.request.urlopen(req) as r:
+        with urllib.request.urlopen(req, timeout=5) as r:
             data=json.loads(r.read().decode())
 
         sonuc=[]
