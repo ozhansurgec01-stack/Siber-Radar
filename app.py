@@ -111,36 +111,5 @@ def deprem_api():
         return jsonify([])
 
 
-@app.route('/api/risk')
-def risk():
-    return jsonify({"durum":"Normal","seviye":0,"renk":"green"})
-
-@app.route('/api/forecast5')
-def forecast5():
-    return jsonify({"tahmin":[
-        {"gun":"Bugün","durum":"Açık"},
-        {"gun":"Yarın","durum":"Parçalı Bulutlu"},
-        {"gun":"3. Gün","durum":"Açık"},
-        {"gun":"4. Gün","durum":"Yağış ihtimali"},
-        {"gun":"5. Gün","durum":"Açık"}
-    ]})
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
-
-
-@app.route('/api/forecast5')
-def forecast5_fix():
-    return jsonify({
-        "tahminler":[
-            {"ikon":"☀️","tarih":"Bugün","durum":"Açık","min":25,"max":39},
-            {"ikon":"⛅","tarih":"Yarın","durum":"Parçalı Bulutlu","min":24,"max":35},
-            {"ikon":"☀️","tarih":"3. Gün","durum":"Açık","min":26,"max":36},
-            {"ikon":"🌧️","tarih":"4. Gün","durum":"Yağış ihtimali","min":22,"max":31},
-            {"ikon":"☀️","tarih":"5. Gün","durum":"Açık","min":25,"max":34}
-        ]
-    })
-
 
 
