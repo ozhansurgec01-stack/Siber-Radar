@@ -13,33 +13,18 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Android tools
+    - name: Setup
       run: |
         sudo apt update
         sudo apt install -y python3-pip openjdk-17-jdk unzip
-        yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
-        sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME \
-          "platform-tools" \
-          "platforms;android-35" \
-          "build-tools;35.0.0" \
-          "build-tools;35.0.0"
-        yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
-
-    - name: Install Buildozer
-      run: |
         pip install --user buildozer cython==0.29.36
         echo "$HOME/.local/bin" >> $GITHUB_PATH
 
     - name: Build APK
       working-directory: apk_siber_radar
-      env:
-        ANDROID_HOME: /usr/local/lib/android/sdk
-        ANDROIDSDK: /usr/local/lib/android/sdk
-        ANDROIDNDK: /usr/local/lib/android/sdk/ndk
       run: |
-        rm -rf .buildozer
-        yes | sdkmanager --licenses || true
-        buildozer -v android debug
+        yes | buildozer android clean || true
+        yes | buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
