@@ -27,17 +27,16 @@ jobs:
 
       - name: Setup Python
         run: |
-          python3 -m venv venv
-          . venv/bin/activate
-          pip install --upgrade pip
-          pip install buildozer cython==0.29.36
+          python3 -m pip install --upgrade pip --user
+          python3 -m pip install --user buildozer cython==0.29.36
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Build APK
         working-directory: apk_siber_radar
         run: |
           ../venv/bin/pip install cython==0.29.36
           export PATH=$PWD/../venv/bin:$PATH
-          ../venv/bin/buildozer android debug
+          buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
