@@ -23,8 +23,16 @@ jobs:
         run: |
           pip3 install --user buildozer cython
 
+      - name: Install Android SDK packages
+        run: |
+          export ANDROID_HOME=$HOME/android-sdk
+          mkdir -p $ANDROID_HOME
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;25.2.9519653"
+
       - name: Build APK
         working-directory: apk_siber_radar
+        env:
+          ANDROID_HOME: $HOME/android-sdk
         run: |
           ~/.local/bin/buildozer android debug
 
