@@ -133,38 +133,32 @@ def forecast5():
         ]
     })
 
-@app.route('/api')
-def deprem_api():
+@app.route("/api")
+def deprem():
+    import requests
     try:
         url="https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
-        req=urllib.request.Request(url,headers={
-            "User-Agent":"Mozilla/5.0",
-            "Accept":"application/json"
-        })
+        r=requests.get(url,timeout=10)
+        print("DEPREM STATUS:",r.status_code)
+        data=r.json()
 
-        with urllib.request.urlopen(req,timeout=10) as r:
-            data=json.loads(r.read().decode())
+        liste=[]
+        for d in data.get("result",[]):
+            c=d.get("geojson",{}).get("coordinates",[None,None])
+            if c[0] is None:
+                continue
 
-        sonuc=[]
-        for d in data.get("result",[])[:200]:
-            sonuc.append({
-                "lat":float(d["geojson"]["coordinates"][1]),
-                "lng":float(d["geojson"]["coordinates"][0]),
-                "mag":float(d["mag"]),
-                "yer":d["title"],
-                "zaman":d["date_time"]
+            liste.append({
+                "lat":c[1],
+                "lng":c[0],
+                "mag":float(d.get("mag") or 0),
+                "yer":d.get("title","Bilinmeyen"),
+                "zaman":d.get("date_time","")
             })
 
-        return jsonify(sonuc),200,{
-            "Cache-Control":"no-store"
-        }
+        print("DEPREM ADET:",len(liste))
+        return jsonify(liste)
 
     except Exception as e:
-        print(e)
+        print("DEPREM HATA:",e)
         return jsonify([])
-
-
-
-if __name__ == '__main__':
-    app.config['SEND_FILE_MAX_AGE_DEFAULT']=0
-    app.run(host='0.0.0.0', port=5000, debug=False)

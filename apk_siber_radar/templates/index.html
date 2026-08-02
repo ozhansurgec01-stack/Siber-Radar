@@ -346,14 +346,14 @@
         havaDurumuArayuzunuGuncelle();
         setInterval(havaDurumuArayuzunuGuncelle, 60000);
 
-        var depremKatmani = L.layerGroup().addTo(map);
+        var depremKatmani = L.layerGroup(); depremKatmani.addTo(map);
         function depremleriYenile() {
             fetch('/api')
                 .then(res => res.json())
                 .then(data => {
                     let listDiv = document.getElementById('list');
-                    if (!data || data.length === 0) return;
-                    listDiv.innerHTML = '';
+                    if (!data) return;
+                    console.log('DEPREM DATA', data); listDiv.innerHTML = '';
                     depremKatmani.clearLayers();
                     let count = 0;
 
@@ -361,8 +361,8 @@
                         if (d.mag >= 3.0) {
                             count++;
                             let renk = d.mag >= 4.0 ? '#f85149' : '#fb923c';
-                            L.circleMarker([d.lat, d.lng], { radius: Math.max(d.mag * 1.8, 3), color: '#fff', fillColor: renk, fillOpacity: 0.85, weight: 1.2 }).addTo(depremKatmani);
-                            listDiv.innerHTML += `<div class="eq-item">🕒 <span class="time-text">${d.zaman}</span> 📍 <b style="color:var(--text-eq-title);">${d.yer}</b><br>💥 Şiddet: <span class="mag-badge" style="background-color:${renk};">${d.mag}</span></div>`;
+                            L.circleMarker([d.lat, d.lng], { radius: Math.max(d.mag * 3, 8), color: '#fff', fillColor: renk, fillOpacity: 0.85, weight: 1.2 }).addTo(depremKatmani).bindPopup('💥 '+d.yer+' M:'+d.mag);
+                            listDiv.innerHTML += `<div class="eq-item">🕒 <span class="time-text">${d.zaman.replace(" "," 🕒 ")}</span> 📍 <b style="color:var(--text-eq-title);">${d.yer}</b><br>💥 Şiddet: <span class="mag-badge" style="background-color:${renk};">${d.mag}</span></div>`;
                         }
                     });
 
