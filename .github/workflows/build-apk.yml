@@ -32,8 +32,7 @@ jobs:
       working-directory: apk_siber_radar
       run: |
         buildozer android clean
-      buildozer android update
-      buildozer android update
+        buildozer android update
         buildozer android debug
 
     - name: Upload APK
