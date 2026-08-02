@@ -14,29 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup system
-        run: |
-          sudo apt update
-          sudo apt install -y \
-            python3-pip \
-            python3-venv \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk
-
-      - name: Setup Python
-        run: |
-          python3 -m pip install --upgrade pip --user
-          python3 -m pip install --user buildozer cython==0.29.36
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
       - name: Build APK
-        working-directory: apk_siber_radar
-        run: |
-          ../venv/bin/pip install cython==0.29.36
-          export PATH=$PWD/../venv/bin:$PATH
-          buildozer android debug
+        uses: ArtemKutsenko/buildozer-action@v1
+        with:
+          workdir: apk_siber_radar
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
