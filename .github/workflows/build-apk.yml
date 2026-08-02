@@ -22,7 +22,7 @@ jobs:
           "platform-tools" \
           "platforms;android-35" \
           "build-tools;35.0.0" \
-          "build-tools;37.0.0"
+          "build-tools;35.0.0"
         yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
     - name: Install Buildozer
@@ -32,8 +32,13 @@ jobs:
 
     - name: Build APK
       working-directory: apk_siber_radar
+      env:
+        ANDROID_HOME: /usr/local/lib/android/sdk
+        ANDROIDSDK: /usr/local/lib/android/sdk
+        ANDROIDNDK: /usr/local/lib/android/sdk/ndk
       run: |
         rm -rf .buildozer
+        yes | sdkmanager --licenses || true
         buildozer -v android debug
 
     - name: Upload APK
