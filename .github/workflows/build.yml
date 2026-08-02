@@ -7,31 +7,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        with:
+          command: buildozer -v android debug
+        env:
+          ANDROID_HOME: /home/runner/android-sdk
 
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \n          python3-pip \n          build-essential \n          git \n          python3-dev \n          ffmpeg \n          libsdl2-dev \n          libsdl2-image-dev \n          libsdl2-mixer-dev \n          libsdl2-ttf-dev \n          libportmidi-dev \n          libswscale-dev \n          libavformat-dev \n          libavcodec-dev \n          zlib1g-dev
-
-    - name: Install Buildozer and Cython
-      run: |
-        pip install --upgrade pip
-        pip install --upgrade buildozer cython==0.29.36
-
-    - name: Build with Buildozer
-      run: |
-        yes | buildozer -v android debug
-
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: package
-        path: bin/*.apk
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: bin/*.apk
