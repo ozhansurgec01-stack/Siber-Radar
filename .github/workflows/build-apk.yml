@@ -18,10 +18,12 @@ jobs:
         sudo apt update
         sudo apt install -y python3-pip openjdk-17-jdk unzip
         yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
-        sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \
+        sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME \
           "platform-tools" \
           "platforms;android-35" \
-          "build-tools;35.0.0" "build-tools;37.0.0"
+          "build-tools;35.0.0" \
+          "build-tools;37.0.0"
+        yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
     - name: Install Buildozer
       run: |
