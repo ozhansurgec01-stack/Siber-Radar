@@ -35,6 +35,8 @@ jobs:
       - name: Build APK
         working-directory: apk_siber_radar
         run: |
+          ../venv/bin/pip install cython==0.29.36
+          export PATH=$PWD/../venv/bin:$PATH
           ../venv/bin/buildozer android debug
 
       - name: Upload APK
