@@ -90,8 +90,12 @@ def forecast5():
 def deprem_api():
     try:
         url="https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
-        req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=5) as r:
+        req=urllib.request.Request(url,headers={
+            "User-Agent":"Mozilla/5.0",
+            "Accept":"application/json"
+        })
+
+        with urllib.request.urlopen(req,timeout=10) as r:
             data=json.loads(r.read().decode())
 
         sonuc=[]
@@ -103,12 +107,14 @@ def deprem_api():
                 "yer":d["title"],
                 "zaman":d["date_time"]
             })
-        return jsonify(sonuc)
 
-    except Exception:
+        return jsonify(sonuc),200,{
+            "Cache-Control":"no-store"
+        }
+
+    except Exception as e:
+        print(e)
         return jsonify([])
-
-
 
 
 
