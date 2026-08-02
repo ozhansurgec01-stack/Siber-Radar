@@ -109,8 +109,6 @@ fullscreen = 0
 
 # (int) Target Android API, should be as high as possible.
 android.api = 35
-android.sdk_path = /data/data/com.termux/files/home/android-sdk
-android.ndk_path = /data/data/com.termux/files/home/android-sdk/ndk/25.2.9519653
 android.build_tools_version = 35.0.0
 
 # (int) Minimum API your APK / AAB will support.
