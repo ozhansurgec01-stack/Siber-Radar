@@ -162,3 +162,7 @@ def deprem():
     except Exception as e:
         print("DEPREM HATA:",e)
         return jsonify([])
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=False)
