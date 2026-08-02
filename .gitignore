@@ -2,3 +2,7 @@ APK/
 apk_siber_radar/
 app_yedek.py
 .buildozer/
+
+.gradle/
+build/
+**/build/
