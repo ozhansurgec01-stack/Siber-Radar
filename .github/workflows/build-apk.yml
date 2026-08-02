@@ -11,23 +11,31 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup
-        run: |
-          sudo apt update
-          sudo apt install -y python3-pip openjdk-17-jdk unzip zip
-          pip install --user buildozer cython==0.29.36
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+    - name: Install Android tools
+      run: |
+        sudo apt update
+        sudo apt install -y python3-pip openjdk-17-jdk unzip
+        yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \
+          "platform-tools" \
+          "platforms;android-35" \
+          "build-tools;35.0.0"
 
-      - name: Build
-        working-directory: apk_siber_radar
-        run: |
-          buildozer android debug
+    - name: Install Buildozer
+      run: |
+        pip install --user buildozer cython==0.29.36
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: siber-radar-apk
-          path: apk_siber_radar/bin/*.apk
+    - name: Build APK
+      working-directory: apk_siber_radar
+      run: |
+        buildozer android clean
+        buildozer android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: siber-radar-apk
+        path: apk_siber_radar/bin/*.apk
