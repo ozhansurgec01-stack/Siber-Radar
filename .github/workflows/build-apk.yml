@@ -14,27 +14,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Setup system
         run: |
           sudo apt update
-          sudo apt install -y python3-pip build-essential git zip unzip openjdk-17-jdk
+          sudo apt install -y \
+            python3-pip \
+            python3-venv \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk
 
-      - name: Install build tools
+      - name: Setup Python
         run: |
-          pip3 install --user buildozer cython
-
-      - name: Install Android SDK packages
-        run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          mkdir -p $ANDROID_HOME
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;25.2.9519653"
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install --upgrade pip
+          pip install buildozer cython==0.29.36
 
       - name: Build APK
         working-directory: apk_siber_radar
-        env:
-          ANDROID_HOME: $HOME/android-sdk
         run: |
-          ~/.local/bin/buildozer android debug
+          ../venv/bin/buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
