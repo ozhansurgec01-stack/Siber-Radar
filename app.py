@@ -86,7 +86,7 @@ def ziyaretci_kaydet():
 app = Flask(__name__)
 
 API_KEY = "47c985532d16457337f109fb907d8a60"
-WEATHER_KEY = "a1f5b4f963e7409d9eb121923263007"
+WEATHER_KEY = "c773bf1c2e3c441bba2182708260308"
 
 # Arayüzdeki hava durumu panelleriyle eşleşen şehir koordinatları ve kodları
 SEHIRLER = [
