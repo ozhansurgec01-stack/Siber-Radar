@@ -39,11 +39,9 @@ public class RadarActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         MapLibre.getInstance(this);
 
         mapView = new MapView(this);
-
         android.widget.FrameLayout ana = new android.widget.FrameLayout(this);
         ana.addView(mapView);
 
@@ -62,47 +60,34 @@ public class RadarActivity extends AppCompatActivity {
                 btn.setOnClickListener(v -> {
                     if (yanginLayer != null) {
                         yanginGoster = !yanginGoster;
-
                         yanginLayer.setProperties(
-                            visibility(
-                                yanginGoster ? "visible" : "none"
-                            )
+                            visibility(yanginGoster ? "visible" : "none")
                         );
                     }
                 });
             }
 
-            panel.addView(btn,
-                new LinearLayout.LayoutParams(65,65)
-            );
+            panel.addView(btn, new LinearLayout.LayoutParams(65, 65));
         }
 
         android.widget.FrameLayout.LayoutParams pp =
-            new android.widget.FrameLayout.LayoutParams(
-                -1, 80, Gravity.TOP
-            );
-
+            new android.widget.FrameLayout.LayoutParams(-1, 80, Gravity.TOP);
         ana.addView(panel, pp);
 
         setContentView(ana);
-
         mapView.onCreate(savedInstanceState);
 
         mapView.getMapAsync(map -> {
             map.setStyle(
-                new Style.Builder()
-                    .fromUri("https://demotiles.maplibre.org/style.json"),
+                new Style.Builder().fromUri("https://demotiles.maplibre.org/style.json"),
                 style -> {
                     map.animateCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            new LatLng(39.0, 35.0),
-                            5.5
-                        )
+                        CameraUpdateFactory.newLatLngZoom(new LatLng(39.0, 35.0), 5.5)
                     );
                     yanginGetir();
-                            kameraGetir();
-                            depremGetir();
-                            radarGetir();
+                    kameraGetir();
+                    depremGetir();
+                    radarGetir();
                 }
             );
         });
@@ -133,13 +118,9 @@ public class RadarActivity extends AppCompatActivity {
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
 
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
-
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 }
@@ -149,622 +130,61 @@ public class RadarActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     try {
-    Feature[] features = new Feature[arr.length()];
-
-    for (int i = 0; i < arr.length(); i++) {
-        JSONObject y = arr.getJSONObject(i);
-
-        double lat = y.getDouble("lat");
-        double lng = y.getDouble("lng");
-
-        Feature f = Feature.fromGeometry(
-                    Point.fromLngLat(lng, lat)
-                );
-
-                f.addStringProperty("il", y.optString("il","Bilinmiyor"));
-                f.addNumberProperty("frp", y.optDouble("frp",0));
-
-                features[i] = f;
-    }
-
-    FeatureCollection fc = FeatureCollection.fromFeatures(features);
-
-    if (mapView != null) {
-        mapView.getMapAsync(map -> {
-            map.getStyle(style -> {
-
-                GeoJsonSource source = new GeoJsonSource(
-                    "yangin-source",
-                    fc
-                );
-
-                style.addSource(source);
-
-                yanginLayer = new CircleLayer(
-                    "yangin-layer",
-                    "yangin-source"
-                );
-
-                CircleLayer layer = yanginLayer;
-
-                layer.setProperties(
-                    circleRadius(8f),
-                    circleColor(Color.RED),
-                    circleOpacity(0.8f)
-                );
-
-                style.addLayer(layer);
-
-                map.addOnMapClickListener(point -> {
-                    java.util.List<Feature> bulunan =
-                        map.queryRenderedFeatures(
-                            map.getProjection().toScreenLocation(point),
-                            "yangin-layer"
-                        );
-
-                    if (!bulunan.isEmpty()) {
-                        Feature f = bulunan.get(0);
-
-                        String il = f.getStringProperty("il");
-                        String frp = String.valueOf(
-                            f.getNumberProperty("frp")
-                        );
-
-                        new android.app.AlertDialog.Builder(RadarActivity.this)
-                            .setTitle("🔥 Yangın")
-                            .setMessage(
-                                "İl: " + il +
-                                "\nFRP: " + frp +
-                                "\nKaynak: NASA FIRMS"
-                            )
-                            .setPositiveButton("Tamam", null)
-                            .show();
-                    }
-
-                    return true;
-                });
-            });
-        });
-    }
-
-
-          } catch (Exception e) {
-              e.printStackTrace();
-          }
-      }).start();
-
-    private void kameraGetir() {
-        new Thread(() -> {
-            try {
-                URL url = new URL("https://siber-radar-1.onrender.com/kameralar.json");
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setRequestMethod("GET");
-
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-
-                JSONArray arr = new JSONArray(sb.toString());
-
-                runOnUiThread(() -> {
-                    try {
                         Feature[] features = new Feature[arr.length()];
 
                         for (int i = 0; i < arr.length(); i++) {
-                            JSONArray k = arr.getJSONArray(i);
+                            JSONObject y = arr.getJSONObject(i);
+                            double lat = y.getDouble("lat");
+                            double lng = y.getDouble("lng");
 
-                            Feature f = Feature.fromGeometry(
-                                Point.fromLngLat(
-                                    k.getDouble(2),
-                                    k.getDouble(1)
-                                )
-                            );
-
-                            f.addStringProperty(
-                                "ad",
-                                k.getString(0)
-                            );
-
-                            f.addStringProperty(
-                                "link",
-                                k.getString(3)
-                            );
-
+                            Feature f = Feature.fromGeometry(Point.fromLngLat(lng, lat));
+                            f.addStringProperty("il", y.optString("il", "Bilinmiyor"));
+                            f.addNumberProperty("frp", y.optDouble("frp", 0));
                             features[i] = f;
                         }
 
-                        FeatureCollection fc =
-                            FeatureCollection.fromFeatures(features);
+                        FeatureCollection fc = FeatureCollection.fromFeatures(features);
 
-                        mapView.getMapAsync(map -> {
-                            map.getStyle(style -> {
+                        if (mapView != null) {
+                            mapView.getMapAsync(map -> {
+                                map.getStyle(style -> {
+                                    GeoJsonSource source = new GeoJsonSource("yangin-source", fc);
+                                    style.addSource(source);
 
-                                GeoJsonSource source =
-                                    new GeoJsonSource(
-                                        "kamera-source",
-                                        fc
+                                    yanginLayer = new CircleLayer("yangin-layer", "yangin-source");
+                                    CircleLayer layer = yanginLayer;
+                                    layer.setProperties(
+                                        circleRadius(8f),
+                                        circleColor(Color.RED),
+                                        circleOpacity(0.8f)
                                     );
+                                    style.addLayer(layer);
 
-                                style.addSource(source);
+                                    map.addOnMapClickListener(point -> {
+                                        java.util.List<Feature> bulunan = map.queryRenderedFeatures(
+                                            map.getProjection().toScreenLocation(point),
+                                            "yangin-layer"
+                                        );
 
-                                kameraLayer =
-                                    new CircleLayer(
-                                        "kamera-layer",
-                                        "kamera-source"
-                                    );
+                                        if (!bulunan.isEmpty()) {
+                                            Feature f = bulunan.get(0);
+                                            String il = f.getStringProperty("il");
+                                            String frp = String.valueOf(f.getNumberProperty("frp"));
 
-                                kameraLayer.setProperties(
-                                    circleRadius(7f),
-                                    circleColor(Color.BLUE),
-                                    circleOpacity(0.9f)
-                                );
-
-                                style.addLayer(kameraLayer);
+                                            new android.app.AlertDialog.Builder(RadarActivity.this)
+                                                .setTitle("🔥 Yangın")
+                                                .setMessage("İl: " + il + "\nFRP: " + frp + "\nKaynak: NASA FIRMS")
+                                                .setPositiveButton("Tamam", null)
+                                                .show();
+                                        }
+                                        return true;
+                                    });
+                                });
                             });
-                        });
-
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-
-    private void depremGetir() {
-        new Thread(() -> {
-            try {
-                URL url = new URL(
-                    "https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
-                );
-
-                HttpURLConnection con =
-                    (HttpURLConnection) url.openConnection();
-
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-
-                JSONObject root = new JSONObject(sb.toString());
-                JSONArray arr = root.getJSONArray("result");
-
-                runOnUiThread(() -> {
-                    try {
-                        Feature[] features =
-                            new Feature[arr.length()];
-
-                        for (int i=0; i<arr.length(); i++) {
-
-                            JSONObject d =
-                                arr.getJSONObject(i);
-
-                            Feature f =
-                                Feature.fromGeometry(
-                                    Point.fromLngLat(
-                                        d.getDouble("lng"),
-                                        d.getDouble("lat")
-                                    )
-                                );
-
-                            f.addStringProperty(
-                                "yer",
-                                d.optString("title","")
-                            );
-
-                            f.addNumberProperty(
-                                "mag",
-                                d.optDouble("mag",0)
-                            );
-
-                            features[i]=f;
                         }
-
-                        FeatureCollection fc =
-                            FeatureCollection.fromFeatures(features);
-
-                        mapView.getMapAsync(map -> {
-                            map.getStyle(style -> {
-
-                                GeoJsonSource source =
-                                    new GeoJsonSource(
-                                        "deprem-source",
-                                        fc
-                                    );
-
-                                style.addSource(source);
-
-                                depremLayer =
-                                    new CircleLayer(
-                                        "deprem-layer",
-                                        "deprem-source"
-                                    );
-
-                                depremLayer.setProperties(
-                                    circleRadius(6f),
-                                    circleColor(Color.YELLOW),
-                                    circleOpacity(0.85f)
-                                );
-
-                                style.addLayer(depremLayer);
-
-                            });
-                        });
-
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                });
-
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-
-    private void radarGetir() {
-        new Thread(() -> {
-            try {
-                URL url = new URL(
-                    "https://api.rainviewer.com/public/weather-maps.json"
-                );
-
-                HttpURLConnection con =
-                    (HttpURLConnection) url.openConnection();
-
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-
-                JSONObject root = new JSONObject(sb.toString());
-
-                JSONArray radar =
-                    root.getJSONObject("radar")
-                    .getJSONArray("past");
-
-                if (radar.length() == 0) return;
-
-                JSONObject son =
-                    radar.getJSONObject(radar.length()-1);
-
-                String time =
-                    son.getString("path");
-
-                String tile =
-                    "https://tilecache.rainviewer.com"
-                    + time
-                    + "/256/{z}/{x}/{y}/2/1_1.png";
-
-                runOnUiThread(() -> {
-
-                    mapView.getMapAsync(map -> {
-                        map.getStyle(style -> {
-
-                            org.maplibre.android.style.sources.RasterSource source =
-                                new org.maplibre.android.style.sources.RasterSource(
-                                    "radar-source",
-                                    tile,
-                                    256
-                                );
-
-                            style.addSource(source);
-
-                            radarLayer =
-                                new org.maplibre.android.style.layers.RasterLayer(
-                                    "radar-layer",
-                                    "radar-source"
-                                );
-
-                            radarLayer.setProperties(
-                                org.maplibre.android.style.layers.PropertyFactory.rasterOpacity(0.55f)
-                            );
-
-                            style.addLayer(radarLayer);
-
-                        });
-                    });
-
-                });
-
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-} catch(Exception e) {
-    e.printStackTrace();
-
-    private void kameraGetir() {
-        new Thread(() -> {
-            try {
-                URL url = new URL("https://siber-radar-1.onrender.com/kameralar.json");
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setRequestMethod("GET");
-
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-
-                JSONArray arr = new JSONArray(sb.toString());
-
-                runOnUiThread(() -> {
-                    try {
-                        Feature[] features = new Feature[arr.length()];
-
-                        for (int i = 0; i < arr.length(); i++) {
-                            JSONArray k = arr.getJSONArray(i);
-
-                            Feature f = Feature.fromGeometry(
-                                Point.fromLngLat(
-                                    k.getDouble(2),
-                                    k.getDouble(1)
-                                )
-                            );
-
-                            f.addStringProperty(
-                                "ad",
-                                k.getString(0)
-                            );
-
-                            f.addStringProperty(
-                                "link",
-                                k.getString(3)
-                            );
-
-                            features[i] = f;
-                        }
-
-                        FeatureCollection fc =
-                            FeatureCollection.fromFeatures(features);
-
-                        mapView.getMapAsync(map -> {
-                            map.getStyle(style -> {
-
-                                GeoJsonSource source =
-                                    new GeoJsonSource(
-                                        "kamera-source",
-                                        fc
-                                    );
-
-                                style.addSource(source);
-
-                                kameraLayer =
-                                    new CircleLayer(
-                                        "kamera-layer",
-                                        "kamera-source"
-                                    );
-
-                                kameraLayer.setProperties(
-                                    circleRadius(7f),
-                                    circleColor(Color.BLUE),
-                                    circleOpacity(0.9f)
-                                );
-
-                                style.addLayer(kameraLayer);
-                            });
-                        });
-
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-
-    private void depremGetir() {
-        new Thread(() -> {
-            try {
-                URL url = new URL(
-                    "https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
-                );
-
-                HttpURLConnection con =
-                    (HttpURLConnection) url.openConnection();
-
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-
-                JSONObject root = new JSONObject(sb.toString());
-                JSONArray arr = root.getJSONArray("result");
-
-                runOnUiThread(() -> {
-                    try {
-                        Feature[] features =
-                            new Feature[arr.length()];
-
-                        for (int i=0; i<arr.length(); i++) {
-
-                            JSONObject d =
-                                arr.getJSONObject(i);
-
-                            Feature f =
-                                Feature.fromGeometry(
-                                    Point.fromLngLat(
-                                        d.getDouble("lng"),
-                                        d.getDouble("lat")
-                                    )
-                                );
-
-                            f.addStringProperty(
-                                "yer",
-                                d.optString("title","")
-                            );
-
-                            f.addNumberProperty(
-                                "mag",
-                                d.optDouble("mag",0)
-                            );
-
-                            features[i]=f;
-                        }
-
-                        FeatureCollection fc =
-                            FeatureCollection.fromFeatures(features);
-
-                        mapView.getMapAsync(map -> {
-                            map.getStyle(style -> {
-
-                                GeoJsonSource source =
-                                    new GeoJsonSource(
-                                        "deprem-source",
-                                        fc
-                                    );
-
-                                style.addSource(source);
-
-                                depremLayer =
-                                    new CircleLayer(
-                                        "deprem-layer",
-                                        "deprem-source"
-                                    );
-
-                                depremLayer.setProperties(
-                                    circleRadius(6f),
-                                    circleColor(Color.YELLOW),
-                                    circleOpacity(0.85f)
-                                );
-
-                                style.addLayer(depremLayer);
-
-                            });
-                        });
-
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-
-    private void radarGetir() {
-        new Thread(() -> {
-            try {
-                URL url = new URL(
-                    "https://api.rainviewer.com/public/weather-maps.json"
-                );
-
-                HttpURLConnection con =
-                    (HttpURLConnection) url.openConnection();
-
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-
-                JSONObject root = new JSONObject(sb.toString());
-
-                JSONArray radar =
-                    root.getJSONObject("radar")
-                    .getJSONArray("past");
-
-                if (radar.length() == 0) return;
-
-                JSONObject son =
-                    radar.getJSONObject(radar.length()-1);
-
-                String time =
-                    son.getString("path");
-
-                String tile =
-                    "https://tilecache.rainviewer.com"
-                    + time
-                    + "/256/{z}/{x}/{y}/2/1_1.png";
-
-                runOnUiThread(() -> {
-
-                    mapView.getMapAsync(map -> {
-                        map.getStyle(style -> {
-
-                            org.maplibre.android.style.sources.RasterSource source =
-                                new org.maplibre.android.style.sources.RasterSource(
-                                    "radar-source",
-                                    tile,
-                                    256
-                                );
-
-                            style.addSource(source);
-
-                            radarLayer =
-                                new org.maplibre.android.style.layers.RasterLayer(
-                                    "radar-layer",
-                                    "radar-source"
-                                );
-
-                            radarLayer.setProperties(
-                                org.maplibre.android.style.layers.PropertyFactory.rasterOpacity(0.55f)
-                            );
-
-                            style.addLayer(radarLayer);
-
-                        });
-                    });
-
-                });
-
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-}
                 });
 
             } catch (Exception e) {
@@ -780,13 +200,9 @@ public class RadarActivity extends AppCompatActivity {
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
 
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
-
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 }
@@ -799,86 +215,51 @@ public class RadarActivity extends AppCompatActivity {
 
                         for (int i = 0; i < arr.length(); i++) {
                             JSONArray k = arr.getJSONArray(i);
-
                             Feature f = Feature.fromGeometry(
-                                Point.fromLngLat(
-                                    k.getDouble(2),
-                                    k.getDouble(1)
-                                )
+                                Point.fromLngLat(k.getDouble(2), k.getDouble(1))
                             );
-
-                            f.addStringProperty(
-                                "ad",
-                                k.getString(0)
-                            );
-
-                            f.addStringProperty(
-                                "link",
-                                k.getString(3)
-                            );
-
+                            f.addStringProperty("ad", k.getString(0));
+                            f.addStringProperty("link", k.getString(3));
                             features[i] = f;
                         }
 
-                        FeatureCollection fc =
-                            FeatureCollection.fromFeatures(features);
+                        FeatureCollection fc = FeatureCollection.fromFeatures(features);
 
                         mapView.getMapAsync(map -> {
                             map.getStyle(style -> {
-
-                                GeoJsonSource source =
-                                    new GeoJsonSource(
-                                        "kamera-source",
-                                        fc
-                                    );
-
+                                GeoJsonSource source = new GeoJsonSource("kamera-source", fc);
                                 style.addSource(source);
 
-                                kameraLayer =
-                                    new CircleLayer(
-                                        "kamera-layer",
-                                        "kamera-source"
-                                    );
-
+                                kameraLayer = new CircleLayer("kamera-layer", "kamera-source");
                                 kameraLayer.setProperties(
                                     circleRadius(7f),
                                     circleColor(Color.BLUE),
                                     circleOpacity(0.9f)
                                 );
-
                                 style.addLayer(kameraLayer);
                             });
                         });
 
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 });
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
-
     private void depremGetir() {
         new Thread(() -> {
             try {
-                URL url = new URL(
-                    "https://api.orhanaydogdu.com.tr/deprem/kandilli/live"
-                );
+                URL url = new URL("https://api.orhanaydogdu.com.tr/deprem/kandilli/live");
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-                HttpURLConnection con =
-                    (HttpURLConnection) url.openConnection();
-
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
-
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 }
@@ -888,153 +269,86 @@ public class RadarActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     try {
-                        Feature[] features =
-                            new Feature[arr.length()];
+                        Feature[] features = new Feature[arr.length()];
 
-                        for (int i=0; i<arr.length(); i++) {
-
-                            JSONObject d =
-                                arr.getJSONObject(i);
-
-                            Feature f =
-                                Feature.fromGeometry(
-                                    Point.fromLngLat(
-                                        d.getDouble("lng"),
-                                        d.getDouble("lat")
-                                    )
-                                );
-
-                            f.addStringProperty(
-                                "yer",
-                                d.optString("title","")
+                        for (int i = 0; i < arr.length(); i++) {
+                            JSONObject d = arr.getJSONObject(i);
+                            Feature f = Feature.fromGeometry(
+                                Point.fromLngLat(d.getDouble("lng"), d.getDouble("lat"))
                             );
-
-                            f.addNumberProperty(
-                                "mag",
-                                d.optDouble("mag",0)
-                            );
-
-                            features[i]=f;
+                            f.addStringProperty("yer", d.optString("title", ""));
+                            f.addNumberProperty("mag", d.optDouble("mag", 0));
+                            features[i] = f;
                         }
 
-                        FeatureCollection fc =
-                            FeatureCollection.fromFeatures(features);
+                        FeatureCollection fc = FeatureCollection.fromFeatures(features);
 
                         mapView.getMapAsync(map -> {
                             map.getStyle(style -> {
-
-                                GeoJsonSource source =
-                                    new GeoJsonSource(
-                                        "deprem-source",
-                                        fc
-                                    );
-
+                                GeoJsonSource source = new GeoJsonSource("deprem-source", fc);
                                 style.addSource(source);
 
-                                depremLayer =
-                                    new CircleLayer(
-                                        "deprem-layer",
-                                        "deprem-source"
-                                    );
-
+                                depremLayer = new CircleLayer("deprem-layer", "deprem-source");
                                 depremLayer.setProperties(
                                     circleRadius(6f),
                                     circleColor(Color.YELLOW),
                                     circleOpacity(0.85f)
                                 );
-
                                 style.addLayer(depremLayer);
-
                             });
                         });
 
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 });
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
-
     private void radarGetir() {
         new Thread(() -> {
             try {
-                URL url = new URL(
-                    "https://api.rainviewer.com/public/weather-maps.json"
-                );
+                URL url = new URL("https://api.rainviewer.com/public/weather-maps.json");
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-                HttpURLConnection con =
-                    (HttpURLConnection) url.openConnection();
-
-                BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream())
-                );
-
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
-
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 }
 
                 JSONObject root = new JSONObject(sb.toString());
-
-                JSONArray radar =
-                    root.getJSONObject("radar")
-                    .getJSONArray("past");
-
+                JSONArray radar = root.getJSONObject("radar").getJSONArray("past");
                 if (radar.length() == 0) return;
 
-                JSONObject son =
-                    radar.getJSONObject(radar.length()-1);
-
-                String time =
-                    son.getString("path");
-
-                String tile =
-                    "https://tilecache.rainviewer.com"
-                    + time
-                    + "/256/{z}/{x}/{y}/2/1_1.png";
+                JSONObject son = radar.getJSONObject(radar.length() - 1);
+                String time = son.getString("path");
+                String tile = "https://tilecache.rainviewer.com" + time + "/256/{z}/{x}/{y}/2/1_1.png";
 
                 runOnUiThread(() -> {
-
                     mapView.getMapAsync(map -> {
                         map.getStyle(style -> {
-
                             org.maplibre.android.style.sources.RasterSource source =
-                                new org.maplibre.android.style.sources.RasterSource(
-                                    "radar-source",
-                                    tile,
-                                    256
-                                );
-
+                                new org.maplibre.android.style.sources.RasterSource("radar-source", tile, 256);
                             style.addSource(source);
 
-                            radarLayer =
-                                new org.maplibre.android.style.layers.RasterLayer(
-                                    "radar-layer",
-                                    "radar-source"
-                                );
-
+                            radarLayer = new org.maplibre.android.style.layers.RasterLayer("radar-layer", "radar-source");
                             radarLayer.setProperties(
                                 org.maplibre.android.style.layers.PropertyFactory.rasterOpacity(0.55f)
                             );
-
                             style.addLayer(radarLayer);
-
                         });
                     });
-
                 });
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
     }
-
 }
