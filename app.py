@@ -671,3 +671,16 @@ def resmi_yangin():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
+
+def hava_durumu_getir(lat, lng):
+    try:
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&current_weather=true"
+        res = requests.get(url, timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            temp = round(data["current_weather"]["temperature"])
+            return f"{temp}°C"
+    except Exception as e:
+        print("Hava durumu hatası:", e)
+    return "--"
