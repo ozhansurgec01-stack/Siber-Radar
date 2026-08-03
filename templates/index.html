@@ -358,20 +358,34 @@ resmiYanginGetir();
 
         var kameralarVerisi = {{ kameralar | tojson }};
         function kameraListesiniDoldur() {
-            var container = document.getElementById('camDropdownContent');
-            if (container.children.length > 0) return;
-            container.innerHTML = '';
-            kameralarVerisi.forEach(function(k) {
-                var [isim, lat, lng, link, type] = k;
-                var ikon = type === 'radar' ? "📡" : (type === 'yt' ? "▶️" : "📷");
-                if (type === 'radar') {
-                    container.innerHTML += `<div class="cam-dropdown-item" onclick="alert('Bu bir sismik istasyon verisidir, istasyon aktiftir.')"><span>${ikon} <b>${isim}</b></span><span style="color:#38bdf8;">[SİSMİK]</span></div>`;
-                } else {
-                    container.innerHTML += `<div class="cam-dropdown-item" onclick="canlıYayınAc('${link}', '${isim}'); togglePanel('cam');"><span>${ikon} <b>${isim}</b></span><span style="color:var(--neon-color);">İzle ▶</span></div>`;
-                }
-            });
-        }
+    var container = document.getElementById('camDropdownContent');
+    if (container.children.length > 0) return;
+    container.innerHTML = '';
 
+    if (!window.kameraLayer) {
+        kameraLayer = L.layerGroup();
+
+        kameralarVerisi.forEach(function(k) {
+            L.marker([k[1], k[2]])
+            .bindPopup(
+                "<b>" + k[0] + "</b><br>" +
+                "<iframe width='300' height='170' src='" + k[3] + "' allowfullscreen></iframe>"
+            )
+            .addTo(kameraLayer);
+        });
+    }
+
+    kameraLayer.addTo(map);
+
+    kameralarVerisi.forEach(function(k) {
+        var ikon = k[4] === 'yt' ? "▶️" : "📷";
+        container.innerHTML +=
+        `<div class="cam-dropdown-item" onclick="canliYayinAc('${k[3]}','${k[0]}'); togglePanel('cam');">
+        <span>${ikon} <b>${k[0]}</b></span>
+        <span style="color:var(--neon-color);">İzle ▶</span>
+        </div>`;
+    });
+}
         function canliTahminGetir() {
             fetch('/api/forecast5')
                 .then(res => res.json())

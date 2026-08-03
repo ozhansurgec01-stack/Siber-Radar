@@ -5,7 +5,7 @@
 
     <application
         android:theme="@style/AppTheme"
-        android:label="Gözcü Radar v1" android:icon="@drawable/gozcu_radar_icon"
+        android:label="Resilix" android:icon="@drawable/gozcu_radar_icon"
         android:usesCleartextTraffic="true">
 
         <activity
@@ -19,6 +19,7 @@
 
         </activity>
 
-    </application>
+        <activity android:name=".RadarActivity" />
+</application>
 
 </manifest>

@@ -1,7 +1,6 @@
 package com.gozcuradar.v1;
 
 import android.os.Bundle;
-import android.content.Intent;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.widget.FrameLayout;
@@ -20,9 +19,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        startActivity(new Intent(this, RadarActivity.class));
-        finish();
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
