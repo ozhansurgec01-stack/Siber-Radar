@@ -849,6 +849,37 @@ async function resmiYanginGetir(){
 
 resmiYanginGetir();
 </script>
+
+<script>
+async function havaDurumlariniGuncelle() {
+    try {
+        const res = await fetch('/api/weather');
+        const data = await res.json();
+        
+        // Ekranda sehir isimlerinin altındaki alanları bulup dereceleri yazar
+        if(data.istanbul) {
+            let istEl = document.querySelector('#istanbul-temp, [data-city="istanbul"]');
+                // Alternatif bulma: Ekranda ISTANBUL yazan yerin altı
+                const els = Array.from(document.querySelectorAll('*'));
+                const istHeader = els.find(e => e.textContent.includes('İSTANBUL'));
+                if(istHeader && istHeader.nextElementSibling) istHeader.nextElementSibling.textContent = data.istanbul;
+            } else { istEl.textContent = data.istanbul; }
+        }
+        if(data.ankara) {
+            let ankEl = document.querySelector('#ankara-temp, [data-city="ankara"]');
+                const els = Array.from(document.querySelectorAll('*'));
+                const ankHeader = els.find(e => e.textContent.includes('ANKARA'));
+                if(ankHeader && ankHeader.nextElementSibling) ankHeader.nextElementSibling.textContent = data.ankara;
+            } else { ankEl.textContent = data.ankara; }
+        }
+    } catch(e) {
+        console.log('Hava durumu JS hatasi:', e);
+    }
+}
+window.addEventListener('DOMContentLoaded', havaDurumlariniGuncelle);
+setInterval(havaDurumlariniGuncelle, 300000); // 5 dakikada bir yenile
+</script>
+
 </body>
 </html>
 
