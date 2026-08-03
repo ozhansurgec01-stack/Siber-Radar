@@ -21,7 +21,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y python3-pip openjdk-17-jdk unzip
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade "pip<24.1"
           pip install --user buildozer==1.5.0 Cython==0.29.33
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
