@@ -1,5 +1,6 @@
 .gradle/
 build/
+**/build/
 local.properties
 *.apk
 *.keystore
@@ -12,3 +13,7 @@ templates/*bozuk*
 gradle/
 gradlew
 gradlew.bat
+APK/
+apk_siber_radar/
+app_yedek.py
+.buildozer/
