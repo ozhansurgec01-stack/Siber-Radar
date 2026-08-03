@@ -122,12 +122,53 @@
       object-fit: contain;
     }
     </style>
+<style>
+/* Açılış Ekranı */
+#splash-screen{
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:#0b0f19;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:99999;
+transition:opacity .5s;
+}
+#splash-screen img{
+width:min(75vw,380px);
+height:auto;
+border-radius:16px;
+}
+#app-header-logo{
+height:32px;
+width:auto;
+}
+</style>
 </head>
 <body>
 
+<div id="splash-screen">
+<img src="/static/resilix_logo.png" alt="RESILIX">
+</div>
+<script>
+window.addEventListener("load",function(){
+setTimeout(function(){
+const s=document.getElementById("splash-screen");
+if(s){
+s.style.opacity="0";
+setTimeout(()=>s.remove(),500);
+}
+},1500);
+});
+</script>
+
+
 
     <div class="top-nav">
-        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;"><img src="/static/resilix_logo.png" class="logo" alt="RESILIX"></div>
+        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><div class="brand-title" style="margin:0;"><span style="font-weight:bold;color:#00f3ff;">📡 RESILIX</span></div>
 <div id="online-box" style="margin-left:3px;margin-top:5px;background:#050b14;color:#00ff88;border:1px solid #00ff88;padding:5px;font-family:monospace;font-size:12px;">
 🟢 ONLINE: 0
 </div><a href="https://instagram.com/totik.01" target="_blank" style="text-decoration:none; color:#E1306C; font-weight:bold; font-size:13px; margin-left:3px;"><span style="display:inline-block; width:16px; height:16px; border-radius:5px; background:linear-gradient(45deg,#feda75,#d62976,#962fbf,#4f5bd5); color:white; text-align:center; line-height:16px; font-size:11px;">◎</span> @totik.01</a></div>
