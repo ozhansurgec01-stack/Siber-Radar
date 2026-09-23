@@ -4,6 +4,7 @@ from flask import Flask, render_template, jsonify
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 import requests
+import urllib.request
 
 import os
 import json
@@ -286,30 +287,107 @@ def forecast5():
         return jsonify({"tahminler":[]})
 @app.route('/api/rain-check')
 def rain_check():
-    try:
-        url = f"http://api.openweathermap.org/data/2.5/weather?lat=37.025&lon=35.371&appid={API_KEY}&units=metric&lang=tr"
-        r = requests.get(url, timeout=10).json()
+    # Adana'nın 15 ilçesini anlık olarak tarar.
+    # Kaynak: Open-Meteo Live API
+    noktalar = [
+        ("Aladağ", 37.5452473, 35.3944418),
+        ("Ceyhan", 37.0288825, 35.8124428),
+        ("Çukurova", 37.0468862, 35.2823275),
+        ("Feke", 37.8240530, 35.9182620),
+        ("İmamoğlu", 37.2577320, 35.6613040),
+        ("Karaisalı", 37.2571843, 35.0586409),
+        ("Karataş", 36.5646007, 35.3841416),
+        ("Kozan", 37.4477857, 35.8166308),
+        ("Pozantı", 37.4229083, 34.8731665),
+        ("Saimbeyli", 37.9845639, 36.0888261),
+        ("Sarıçam", 37.0197412, 35.3989919),
+        ("Seyhan", 37.1024202, 35.3061086),
+        ("Tufanbeyli", 38.2603004, 36.2220740),
+        ("Yumurtalık", 36.7824460, 35.7994910),
+        ("Yüreğir", 36.9894584, 35.3408834),
+    ]
 
-        hava = r.get("weather", [{}])[0].get("description", "").lower()
+    # WMO yağış kodları:
+    # 51-67: çiseleme/yağmur,
+    # 80-82: sağanak,
+    # 95-99: gök gürültülü sağanak.
+    aktif_yagis_kodlari = (
+        set(range(51, 68))
+        | set(range(80, 83))
+        | set(range(95, 100))
+    )
 
-        if any(x in hava for x in ["yağmur", "rain", "sağanak", "drizzle", "fırtına"]):
-            durum = "Yağmur yağıyor"
-        else:
-            durum = "Yağış yok / Açık"
+    def ilce_kontrol(ilce, lat, lon):
+        try:
+            url = (
+                "https://api.open-meteo.com/v1/forecast"
+                f"?latitude={lat}&longitude={lon}"
+                "&current=weathercode,precipitation,rain,showers"
+            )
 
-        return jsonify({
-            "yerler": [
-                {
-                    "il": "Adana",
-                    "ilçe": "Merkez",
-   "ilce": "Merkez",
-                    "durum": durum
-                }
-            ]
-        })
+            req = urllib.request.Request(
+                url,
+                headers={"User-Agent": "Siber-Radar/1.0"}
+            )
 
-    except Exception as e:
-        return jsonify({"yerler":[{"il":"Adana","ilçe":"Merkez","ilce":"Merkez","durum":"Veri alınamadı"}]})
+            with urllib.request.urlopen(req, timeout=5) as response:
+                if response.getcode() != 200:
+                    return None
+
+                data = json.loads(response.read().decode("utf-8"))
+                current = data.get("current", {})
+
+                code = current.get("weathercode")
+                precipitation = current.get("precipitation", 0) or 0
+                rain = current.get("rain", 0) or 0
+                showers = current.get("showers", 0) or 0
+
+                aktif = (
+                    code in aktif_yagis_kodlari
+                    or precipitation > 0
+                    or rain > 0
+                    or showers > 0
+                )
+
+                if aktif:
+                    return {
+                        "il": "Adana",
+                        "ilçe": ilce,
+                        "ilce": ilce,
+                        "durum": "🌧️ (Aktif Yağış)"
+                    }
+
+        except Exception:
+            return None
+
+        return None
+
+    sonuc = []
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(max_workers=6) as executor:
+        futures = [
+            executor.submit(ilce_kontrol, ilce, lat, lon)
+            for ilce, lat, lon in noktalar
+        ]
+
+        for future in futures:
+            try:
+                veri = future.result()
+                if veri:
+                    sonuc.append(veri)
+            except Exception:
+                continue
+
+    return jsonify({
+        "durum": "aktif" if sonuc else "yok",
+        "yerler": sonuc,
+        "kaynak": "Open-Meteo Live API",
+        "il": "Adana",
+        "taranan_ilce_sayisi": len(noktalar)
+    })
+
 
 @app.route('/api/storm')
 def storm():
