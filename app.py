@@ -349,18 +349,55 @@ def rain_check():
                     or showers > 0
                 )
 
+                durumlar = {
+                    0: "☀️ Açık",
+                    1: "🌤️ Çoğunlukla Açık",
+                    2: "⛅ Parçalı Bulutlu",
+                    3: "☁️ Kapalı",
+                    45: "🌫️ Sisli",
+                    48: "🌫️ Kırağılı Sis",
+                    51: "🌦️ Hafif Çiseleme",
+                    53: "🌦️ Çiseleme",
+                    55: "🌧️ Yoğun Çiseleme",
+                    56: "🌧️ Donan Çiseleme",
+                    57: "🌧️ Yoğun Donan Çiseleme",
+                    61: "🌧️ Hafif Yağmur",
+                    63: "🌧️ Yağmur",
+                    65: "🌧️ Şiddetli Yağmur",
+                    66: "🌧️ Donan Yağmur",
+                    67: "🌧️ Şiddetli Donan Yağmur",
+                    71: "🌨️ Hafif Kar",
+                    73: "🌨️ Kar",
+                    75: "❄️ Yoğun Kar",
+                    77: "🌨️ Kar Taneleri",
+                    80: "🌦️ Hafif Sağanak",
+                    81: "🌧️ Sağanak",
+                    82: "🌧️ Şiddetli Sağanak",
+                    85: "🌨️ Hafif Kar Sağanağı",
+                    86: "❄️ Yoğun Kar Sağanağı",
+                    95: "⛈️ Gök Gürültülü Sağanak",
+                    96: "⛈️ Dolu İhtimalli Gök Gürültülü Sağanak",
+                    99: "⛈️ Şiddetli Gök Gürültülü Sağanak"
+                }
+
+                durum = durumlar.get(code, "🌤️ Anlık durum bilgisi alındı")
+
                 if aktif:
-                    return {
-                        "il": "Adana",
-                        "ilçe": ilce,
-                        "ilce": ilce,
-                        "durum": "🌧️ (Aktif Yağış)"
-                    }
+                    durum = "🌧️ Aktif Yağış"
+
+                return {
+                    "il": "Adana",
+                    "ilçe": ilce,
+                    "ilce": ilce,
+                    "durum": durum,
+                    "weathercode": code,
+                    "yagis": precipitation,
+                    "rain": rain,
+                    "showers": showers
+                }
 
         except Exception:
             return None
-
-        return None
 
     sonuc = []
 
